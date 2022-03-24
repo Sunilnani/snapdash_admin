@@ -37,6 +37,8 @@ dependencies:
 
   page_transition: any
 
+  image_picker: ^0.8.4+11
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

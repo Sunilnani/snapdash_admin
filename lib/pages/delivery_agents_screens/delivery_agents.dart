@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:snapdash_admin/base_home_page.dart';
+import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/pages/delivery_agents_screens/add_delivery_agent.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 class DeliveryAgents extends StatefulWidget {
   const DeliveryAgents({Key? key}) : super(key: key);
@@ -10,34 +15,7 @@ class DeliveryAgents extends StatefulWidget {
 }
 
 class _DeliveryAgentsState extends State<DeliveryAgents> {
-  List<String> ListOfAlphabets = [
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-    "Q",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-    "Z",
-  ];
+
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
@@ -46,7 +24,7 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
         children: [
           Container(
             height: MediaQuery.of(context).size.height*0.3,
-            color: Colors.pink[200],
+            color: AppColors.bgpink,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 58.0,left: 30,right: 30),
               child: Row(
@@ -55,12 +33,17 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                   IntrinsicHeight(
                     child: Row(
                       children: [
-                        Text(
-                          "Delivery Boys",
-                          style: TextStyle(
-                              color:Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400),
+                        InkWell(
+                          onTap:(){
+                           // TakePhoto(ImageSource.gallery,insidePic!);
+                          },
+                          child: Text(
+                            "Delivery Boys",
+                            style: TextStyle(
+                                color:Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                          ),
                         ),
                         VerticalDivider(
                           color: AppColors.appColor,
@@ -131,7 +114,7 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                       GestureDetector(
                         onTap: (){
                          // _openAddProduct();
-                          // NavigationService().navigatePage(AddProduct());
+                           NavigationService().navigatePage(AddDeliveryAgent());
                         },
                         child: Container(
                             height: 38,
@@ -193,6 +176,86 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                         spreadRadius: 0,
                         color: Colors.black.withOpacity(0.4))
                   ]
+              ),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    color: AppColors.whitecolor,
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: [
+                      BoxShadow(
+                          offset: Offset(0, 3),
+                          blurRadius: 10,
+                          spreadRadius: 0,
+                          color: Colors.black.withOpacity(0.3))
+                    ]),
+                child: DataTable(
+                  // columnSpacing: 38.0,
+                  dataRowHeight: 70,
+                  headingRowColor: MaterialStateColor.resolveWith((states) {return Colors.greenAccent;},),
+                  columns: [
+                    DataColumn(label: Text('IMAGE')),
+                    DataColumn(label: Text('COLORS')),
+                    DataColumn(label: Text('SHAPE')),
+                    DataColumn(label: Text('MATERIAL')),
+                    DataColumn(label: Text('CATEGORY')),
+                    DataColumn(label: Text('SUB CATEGORY')),
+                    DataColumn(label: Text('PRODUCT NAME')),
+                    DataColumn(label: Text('VARIENT')),
+                  ],
+                  rows: List.generate(1, (index) {
+                    final image = "image";
+                    final colors = "red";
+                    final shape = "circular";
+                    final material = "strong";
+                    final category = "iron";
+                    final sub_category = "mettallic";
+                    final product_name = "blade";
+                    final varient = "bike";
+
+
+                    return DataRow(
+
+                        cells: [
+                          DataCell(
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.rectangle,
+                                      borderRadius: BorderRadius.circular(4),
+                                      color: AppColors.appColor),
+                                  // child: ImageWidget(
+                                  //     imageUrl: URLS.buildImageUrl(
+                                  //         "${image}"))
+                                child: Text(image),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            CircleAvatar(
+                                radius: 14,
+                                backgroundColor: AppColors.appColor,
+                                // child:ImageWidget(
+                                //     imageUrl: URLS.buildImageUrl(
+                                //         "${image}"))
+                              child: Text(colors),
+                            ),
+                          ),
+                          DataCell(
+                              Container( child: Text(shape))),
+                          DataCell(Container( child: Text(material))),
+                          DataCell(Container( child: Text(category))),
+                          DataCell(Container( child: Text(sub_category))),
+                          DataCell(Container( child: Text(product_name))),
+                          DataCell(Container( child: Text(varient))),
+
+                        ]);
+                  }),
+                ),
               ),
             ),
           ),
