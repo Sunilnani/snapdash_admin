@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/pages/my_vehicles_screens/my_vehicles.dart';
+import 'package:snapdash_admin/pages/orders_screens/order_details.dart';
+import 'package:snapdash_admin/pages/users_screens/view_user.dart';
 
 import 'pages/authentication_pages/login_page.dart';
 
@@ -23,7 +26,7 @@ class MyApp extends StatelessWidget {
         NavigationService.routeObserver,
       ],
       navigatorKey: NavigationService.navigatorKey,
-      home: const LoginPage(),
+      home: const MyVehicles(),
 
     );
   }

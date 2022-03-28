@@ -11,7 +11,7 @@ class _ActiveAreasState extends State<ActiveAreas> {
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
-      activeIndex: 2,
+      activeIndex: 5,
         child: Container(color: Colors.green,));
   }
 }

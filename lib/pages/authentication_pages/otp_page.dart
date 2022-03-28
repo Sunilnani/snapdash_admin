@@ -2,14 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/base_home_page.dart';
 import 'package:snapdash_admin/common/button_widget.dart';
 import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/auth_manager.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/pages/delivery_agents_screens/delivery_agents.dart';
+import 'package:snapdash_admin/pages/my_vehicles_screens/my_vehicles.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 class OTPScreen extends StatefulWidget {
-  const OTPScreen({Key? key}) : super(key: key);
+  OTPScreen({required this.number});
+
+  final String number;
 
   @override
   State<OTPScreen> createState() => _OTPScreenState();
@@ -38,6 +44,74 @@ class _OTPScreenState extends State<OTPScreen> {
       },
     );
   }
+
+
+  final passwordController = TextEditingController();
+  final numberController = TextEditingController();
+
+
+
+
+  Future<void> performLogin() async {
+
+    setState(() {
+      _loading = true;
+    });
+
+    final response = await authManager.performLogin(widget.number);
+
+    setState(() {
+      _loading = false;
+    });
+
+    if (response.status == ResponseStatus.SUCCESS) {
+      Fluttertoast.showToast(msg: "OTP sent");
+      setState(() {
+        _start = 30;
+      });
+      startTimer();
+    } else {
+      Fluttertoast.showToast(msg: response.message);
+    }
+  }
+
+
+
+  Future<void> verifyotp() async {
+    //String name = numberController.text.trim();
+    String pass = passwordController.text.trim();
+    if (pass.isEmpty) {
+      Fluttertoast.showToast( msg:"enter details");
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+    });
+
+    final response = await authManager.verifyOTP(widget.number, pass);
+
+    print("responses are ${response.data}");
+
+    setState(() {
+      _loading = false;
+      print("responses are ${response.data}");
+    });
+    print("responses are ${response.data}");
+
+
+    if (response.status == ResponseStatus.SUCCESS) {
+
+      Fluttertoast.showToast(msg:response.message);
+
+      NavigationService().navigatePage(MyVehicles(),replaceAll: true);
+      // NavigationService().navigatePage(HomePage());
+    } else {
+      Fluttertoast.showToast(msg:response.message);
+    }
+  }
+
+
   void initState() {
     startTimer();
     super.initState();
@@ -124,7 +198,7 @@ class _OTPScreenState extends State<OTPScreen> {
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   ),
-                                  // controller: numberController,
+                                   controller: passwordController,
                                   cursorColor: AppColors.appColor,
                                   keyboardType: TextInputType.phone,
                                   inputFormatters: <TextInputFormatter>[
@@ -176,9 +250,9 @@ class _OTPScreenState extends State<OTPScreen> {
 
                 InkWell(
                     onTap: () {
-                      //verifyotp();
+                      verifyotp();
                       // performLogin();
-                      NavigationService().navigatePage(DeliveryAgents());
+                      //NavigationService().navigatePage(DeliveryAgents());
                     },
                     child: ButtonWidget(
                       name: "Login",

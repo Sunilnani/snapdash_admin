@@ -1,9 +1,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/common/button_widget.dart';
 import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/auth_manager.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/pages/authentication_pages/otp_page.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 class LoginPage extends StatefulWidget {
@@ -15,6 +18,39 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
+
+  //final passwordController = TextEditingController();
+  final numberController = TextEditingController();
+
+
+
+  Future<void> performLogin() async {
+    String phone = numberController.text.trim();
+    if (phone.isEmpty) {
+      Fluttertoast.showToast( msg:"enter details");
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+    });
+
+    final response = await authManager.performLogin(phone);
+
+    setState(() {
+      _loading = false;
+    });
+
+    if (response.status == ResponseStatus.SUCCESS) {
+      print("===============${response.data}");
+      Fluttertoast.showToast(msg:response.message);
+
+      NavigationService().navigatePage(OTPScreen(number: "${phone}"));
+    } else {
+      Fluttertoast.showToast(msg:response.message);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                                    fontSize: 18,
                                    fontWeight: FontWeight.w600,
                                  ),
-                                 // controller: numberController,
+                                  controller: numberController,
                                  cursorColor: AppColors.appColor,
                                  keyboardType: TextInputType.phone,
                                  inputFormatters: <TextInputFormatter>[
@@ -132,8 +168,8 @@ class _LoginPageState extends State<LoginPage> {
                 InkWell(
                     onTap: () {
                       //verifyotp();
-                     // performLogin();
-                      NavigationService().navigatePage(OTPScreen());
+                      performLogin();
+                      //NavigationService().navigatePage(OTPScreen(number: number));
                     },
                     child: ButtonWidget(
                       name: "NEXT",

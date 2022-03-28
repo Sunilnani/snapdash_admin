@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:snapdash_admin/base_home_page.dart';
+import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/pages/delivery_agents_screens/add_delivery_agent/add_agent_bank_details.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 class AddDeliveryAgent extends StatefulWidget {
   const AddDeliveryAgent({Key? key}) : super(key: key);
@@ -22,40 +24,62 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
       insidePic = File(pickerFile!.path);
     });
   }
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
-        activeIndex: 0,
+        activeIndex: 1,
         child: Stack(
           children: [
             Container(
               height: MediaQuery.of(context).size.height*0.3,
               color: AppColors.bgpink,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 58.0,left: 30,right: 30),
+                padding: const EdgeInsets.only(bottom: 58.0,left: 70,right: 70),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IntrinsicHeight(
                       child: Row(
                         children: [
-                          Text(
-                            "Delivery Boys",
-                            style: TextStyle(
-                                color:Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400),
+                          InkWell(
+                            onTap:(){
+                              NavigationService().pop();
+                            },
+                            child: Text(
+                              "Delivery Agents",
+                              style: TextStyle(
+                                  color:Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500),
+                            ),
                           ),
                           VerticalDivider(
-                            color: AppColors.appColor,
+                            color: AppColors.black,
                             thickness: 1.25,
                           ),
                           Text(
-                            "Add Delivery Agent",
+                            "Add Delivery Agent - step 1",
+                            style: TextStyle(
+                                color: AppColors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          VerticalDivider(
+                            color: AppColors.black,
+                            thickness: 1.25,
+                          ),
+                          Text(
+                            "Personal Details",
                             style: TextStyle(
                                 color: AppColors.appColor,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w400),
+                                fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -73,7 +97,7 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
               right: 100,
               child: Container(
                 height: MediaQuery.of(context).size.height*0.7,
-                padding: EdgeInsets.only(left: 50,right: 50,top:40,bottom: 50),
+                padding: EdgeInsets.only(left: 70,right: 90,top:90,bottom: 50),
 
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -91,7 +115,18 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Personal Details",style: TextStyle(color: AppColors.black,fontSize: 22,fontWeight: FontWeight.w600),),
+                          Image.asset("assets/images/personalDetails.jpeg",
+                            width: 270,),
+                          Container(),
+
+                        ],
+                      ),
+                      SizedBox(height: 120,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                         children: [
                           Text("Profile Picture",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
                           Column(
@@ -146,11 +181,13 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 40,),
+                      SizedBox(height: 60,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -236,6 +273,7 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
                               SizedBox(height: 30,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                                 children: [
                                   Text("Date of Birth",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
                                   SizedBox(width: 100,),
@@ -319,7 +357,7 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Email Id",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
+                                  Text("Alternate Mobile Number",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
                                   SizedBox(width: 100,),
 
                                   Container(
@@ -360,7 +398,95 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  Text("Email Id",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
+                                  SizedBox(width: 100,),
+
+                                  Container(
+                                    padding: EdgeInsets.only(left: 14, right: 14),
+                                    height: 50,
+                                    width: MediaQuery.of(context).size.width*0.25,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: AppColors.whitecolor,
+                                        border: Border.all(color: AppColors.grey)
+                                    ),
+                                    child:TextField(
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      // controller: numberController,
+                                      cursorColor: AppColors.appColor,
+                                      // keyboardType: TextInputType.phone,
+                                      //  inputFormatters: <TextInputFormatter>[
+                                      //    FilteringTextInputFormatter.digitsOnly,
+                                      //    LengthLimitingTextInputFormatter(20)
+                                      //  ],
+                                      decoration: InputDecoration(
+                                        //hintText: "Search here",
+                                          hintStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey[500]),
+                                          border: InputBorder.none),
+                                    ),
+
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 30,),
+
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
                                   Text("Street",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
+                                  SizedBox(width: 100,),
+
+                                  Container(
+                                    padding: EdgeInsets.only(left: 14, right: 14),
+                                    height: 50,
+                                    width: MediaQuery.of(context).size.width*0.25,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: AppColors.whitecolor,
+                                        border: Border.all(color: AppColors.grey)
+                                    ),
+                                    child:TextField(
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      // controller: numberController,
+                                      cursorColor: AppColors.appColor,
+                                      // keyboardType: TextInputType.phone,
+                                      //  inputFormatters: <TextInputFormatter>[
+                                      //    FilteringTextInputFormatter.digitsOnly,
+                                      //    LengthLimitingTextInputFormatter(20)
+                                      //  ],
+                                      decoration: InputDecoration(
+                                        //hintText: "Search here",
+                                          hintStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey[500]),
+                                          border: InputBorder.none),
+                                    ),
+
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 30,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Area",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
                                   SizedBox(width: 100,),
 
                                   Container(
@@ -437,15 +563,12 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
 
                                   ),
                                 ],
-                              )
-                            ],
-                          ),
-                          Column(
-                            children: [
+                              ),
+                              SizedBox(height: 30,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Vehicle Class",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
+                                  Text("State",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
                                   SizedBox(width: 100,),
 
                                   Container(
@@ -486,7 +609,7 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Make/Made",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
+                                  Text("Pincode",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
                                   SizedBox(width: 100,),
 
                                   Container(
@@ -524,210 +647,10 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
                                 ],
                               ),
                               SizedBox(height: 30,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Registration Number",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
-                                  SizedBox(width: 100,),
 
-                                  Container(
-                                    padding: EdgeInsets.only(left: 14, right: 14),
-                                    height: 50,
-                                    width: MediaQuery.of(context).size.width*0.25,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: AppColors.whitecolor,
-                                        border: Border.all(color: AppColors.grey)
-                                    ),
-                                    child:TextField(
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      // controller: numberController,
-                                      cursorColor: AppColors.appColor,
-                                      // keyboardType: TextInputType.phone,
-                                      //  inputFormatters: <TextInputFormatter>[
-                                      //    FilteringTextInputFormatter.digitsOnly,
-                                      //    LengthLimitingTextInputFormatter(20)
-                                      //  ],
-                                      decoration: InputDecoration(
-                                        //hintText: "Search here",
-                                          hintStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.grey[500]),
-                                          border: InputBorder.none),
-                                    ),
 
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 30,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Engine Number",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
-                                  SizedBox(width: 100,),
 
-                                  Container(
-                                    padding: EdgeInsets.only(left: 14, right: 14),
-                                    height: 50,
-                                    width: MediaQuery.of(context).size.width*0.25,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: AppColors.whitecolor,
-                                        border: Border.all(color: AppColors.grey)
-                                    ),
-                                    child:TextField(
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      // controller: numberController,
-                                      cursorColor: AppColors.appColor,
-                                      // keyboardType: TextInputType.phone,
-                                      //  inputFormatters: <TextInputFormatter>[
-                                      //    FilteringTextInputFormatter.digitsOnly,
-                                      //    LengthLimitingTextInputFormatter(20)
-                                      //  ],
-                                      decoration: InputDecoration(
-                                        //hintText: "Search here",
-                                          hintStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.grey[500]),
-                                          border: InputBorder.none),
-                                    ),
 
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 30,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Registration Upto",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
-                                  SizedBox(width: 100,),
-
-                                  Container(
-                                    padding: EdgeInsets.only(left: 14, right: 14),
-                                    height: 50,
-                                    width: MediaQuery.of(context).size.width*0.25,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: AppColors.whitecolor,
-                                        border: Border.all(color: AppColors.grey)
-                                    ),
-                                    child:TextField(
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      // controller: numberController,
-                                      cursorColor: AppColors.appColor,
-                                      // keyboardType: TextInputType.phone,
-                                      //  inputFormatters: <TextInputFormatter>[
-                                      //    FilteringTextInputFormatter.digitsOnly,
-                                      //    LengthLimitingTextInputFormatter(20)
-                                      //  ],
-                                      decoration: InputDecoration(
-                                        //hintText: "Search here",
-                                          hintStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.grey[500]),
-                                          border: InputBorder.none),
-                                    ),
-
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 30,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Bike Number",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
-                                  SizedBox(width: 100,),
-
-                                  Container(
-                                    padding: EdgeInsets.only(left: 14, right: 14),
-                                    height: 50,
-                                    width: MediaQuery.of(context).size.width*0.25,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: AppColors.whitecolor,
-                                        border: Border.all(color: AppColors.grey)
-                                    ),
-                                    child:TextField(
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      // controller: numberController,
-                                      cursorColor: AppColors.appColor,
-                                      // keyboardType: TextInputType.phone,
-                                      //  inputFormatters: <TextInputFormatter>[
-                                      //    FilteringTextInputFormatter.digitsOnly,
-                                      //    LengthLimitingTextInputFormatter(20)
-                                      //  ],
-                                      decoration: InputDecoration(
-                                        //hintText: "Search here",
-                                          hintStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.grey[500]),
-                                          border: InputBorder.none),
-                                    ),
-
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 30,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("RC Number",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
-                                  SizedBox(width: 100,),
-
-                                  Container(
-                                    padding: EdgeInsets.only(left: 14, right: 14),
-                                    height: 50,
-                                    width: MediaQuery.of(context).size.width*0.25,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: AppColors.whitecolor,
-                                        border: Border.all(color: AppColors.grey)
-                                    ),
-                                    child:TextField(
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      // controller: numberController,
-                                      cursorColor: AppColors.appColor,
-                                      // keyboardType: TextInputType.phone,
-                                      //  inputFormatters: <TextInputFormatter>[
-                                      //    FilteringTextInputFormatter.digitsOnly,
-                                      //    LengthLimitingTextInputFormatter(20)
-                                      //  ],
-                                      decoration: InputDecoration(
-                                        //hintText: "Search here",
-                                          hintStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.grey[500]),
-                                          border: InputBorder.none),
-                                    ),
-
-                                  ),
-                                ],
-                              )
                             ],
                           )
                         ],
@@ -747,15 +670,20 @@ class _AddDeliveryAgentState extends State<AddDeliveryAgent> {
                             child: Text("Cancel",style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: AppColors.red),),
                           ),
                           SizedBox(width: 100,),
-                          Container(
-                            alignment: Alignment.center,
-                            height: 55,
-                            width: 150,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                               color: AppColors.red
+                          InkWell(
+                            onTap: (){
+                              NavigationService().navigatePage(AddAgentBankDetails());
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 55,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                 color: AppColors.red
+                              ),
+                              child: Text("Next",style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: AppColors.whitecolor),),
                             ),
-                            child: Text("Submit",style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: AppColors.whitecolor),),
                           )
                         ],
                       )

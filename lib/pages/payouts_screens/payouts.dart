@@ -11,7 +11,7 @@ class _PayOutsState extends State<PayOuts> {
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
-        activeIndex: 1,
+        activeIndex: 4,
         child: Container(
           color: Colors.green,
         ));

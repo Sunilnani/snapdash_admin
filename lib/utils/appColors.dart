@@ -25,10 +25,14 @@ class AppColors{
   static Color red= Color(0xFFE30000);
   static Color light_red=Color(0x1AE30000);
   static Color whitecolor=Colors.white;
-  static Color bgpink=Colors.pink.withOpacity(0.3);
+  static Color bgpink=Colors.pink.withOpacity(0.2);
   static Color black=Colors.black;
-  static Color grey= Colors.grey.withOpacity(0.3);
-
+  static Color grey= Colors.grey.withOpacity(0.8);
+  static Color greylight= Colors.grey.withOpacity(0.4);
+  static Color darkGrey=Colors.black.withOpacity(0.7);
+  static Color lightblue=Color(0xFFF6F9FC);
+  static TextStyle headingstyle= TextStyle(color:AppColors.black,fontSize: 22,fontWeight: FontWeight.w600);
+  static TextStyle subheadingred= TextStyle(color:AppColors.red,fontSize: 16,fontWeight: FontWeight.w500);
 
 
 
