@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:snapdash_admin/base_home_page.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/pages/orders_screens/widgets/drop_down_widget.dart';
+import 'package:snapdash_admin/pages/payouts_screens/statistics.dart';
 import 'package:snapdash_admin/pages/payouts_screens/payouts_history.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
-class PayOuts extends StatefulWidget {
-  const PayOuts({Key? key}) : super(key: key);
+class AgentPaymentDetails extends StatefulWidget {
+  const AgentPaymentDetails({Key? key}) : super(key: key);
 
   @override
-  State<PayOuts> createState() => _PayOutsState();
+  State<AgentPaymentDetails> createState() => _AgentPaymentDetailsState();
 }
 
-class _PayOutsState extends State<PayOuts> {
+class _AgentPaymentDetailsState extends State<AgentPaymentDetails> {
+
+
   DateTime selectedDate = DateTime.now();
 
   Future<void> _selectDate(BuildContext context) async {
@@ -48,8 +51,8 @@ class _PayOutsState extends State<PayOuts> {
                               SizedBox(width: 10,),
                               InkWell(
                                 onTap:(){
+                                  NavigationService().navigatePage(Statistics());
                                   // TakePhoto(ImageSource.gallery,insidePic!);
-                                  NavigationService().pop();
                                 },
                                 child: Text(
                                   "Payouts",
@@ -63,8 +66,24 @@ class _PayOutsState extends State<PayOuts> {
                                 color: AppColors.black,
                                 thickness: 1.25,
                               ),
+                          InkWell(
+                            onTap: (){
+                              NavigationService().pop();
+                            },
+                            child: Text(
+                              "Payouts History",
+                              style: TextStyle(
+                                  color:Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        VerticalDivider(
+                          color: AppColors.black,
+                          thickness: 1.25,
+                        ),
                               Text(
-                                "View Agent List",
+                                "Agent Payout Details",
                                 style: TextStyle(
                                     color: AppColors.appColor,
                                     fontSize: 14,
@@ -73,60 +92,10 @@ class _PayOutsState extends State<PayOuts> {
                             ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(left: 14, right: 14),
-                              height: 50,
-                              width: MediaQuery.of(context).size.width*0.34,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(4),
-                                color: AppColors.whitecolor,
-                              ),
-                              child:TextField(
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                // controller: numberController,
-                                cursorColor: AppColors.appColor,
-                                // keyboardType: TextInputType.phone,
-                                //  inputFormatters: <TextInputFormatter>[
-                                //    FilteringTextInputFormatter.digitsOnly,
-                                //    LengthLimitingTextInputFormatter(20)
-                                //  ],
-                                decoration: InputDecoration(
-                                    hintText: "Search here",
-                                    hintStyle: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.grey[500]),
-                                    border: InputBorder.none),
-                              ),
-
-                            ),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              height: 50,
-                              width: MediaQuery.of(context).size.width*0.05,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(4),
-                                color: AppColors.whitecolor,
-                              ),
-                              child: Text("Search",style: TextStyle(color: AppColors.red,fontWeight: FontWeight.w600),),
-
-                            ),
-                          ],
-                        ),
                         GestureDetector(
                           onTap: (){
                             // _openAddProduct();
-                            NavigationService().navigatePage(PayOutHistory());
+                            //NavigationService().navigatePage(AddDeliveryAgent());
                           },
                           child: Container(
                               height: 50,
@@ -143,14 +112,27 @@ class _PayOutsState extends State<PayOuts> {
                                         color:AppColors.appColor)
                                   ]),
                               child: Center(
-                                child:  Text("View Payment History",
-                                    style: TextStyle(
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.add,
+                                      size: 15,
                                       color: AppColors.whitecolor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    )),
+                                    ),
+                                    SizedBox(
+                                      width: 12,
+                                    ),
+                                    Text("Download Receipt",
+                                        style: TextStyle(
+                                          color: AppColors.whitecolor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        )),
+                                  ],
+                                ),
                               )),
                         )
+
                       ],
                     ),
                   ),
@@ -248,44 +230,22 @@ class _PayOutsState extends State<PayOuts> {
                   dataRowHeight: 70,
                   headingRowColor: MaterialStateColor.resolveWith((states) {return AppColors.lightblue;},),
                   columns: [
-                    DataColumn(label:Text('S.NO',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('EmpID',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Agent Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Agent Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label:Text('Transaction ID',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Time',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     DataColumn(label: Text('Mobile Number',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Gender',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Orders Delivered',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Send Payment',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Account Number',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Amount Paid',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                   ],
                   rows: List.generate(3, (index) {
-                    final sNo = "23";
-                    final empId = "#12344";
-                    final image=CircleAvatar(
-                      backgroundColor: AppColors.red,
-                      radius: 25,
-                    );
-                    final name = "hitler";
+                    final transactionId = "23";
+                    final date = "29-12-2022";
+                    final time = "12 Am";
                     final mobileNumber = "989898988988";
-                    final gender = "Male";
-                    final orderDeliverd = "250";
-                    final grandTotal = "c 2050";
-                    final sendPayment = Container(
-                      padding: EdgeInsets.all(10),
-                      alignment: Alignment.center,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.bgpink,
-                        borderRadius: BorderRadius.circular(20)
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text("Send",style: AppColors.titleRed,),
-                          Icon(Icons.send,color: AppColors.red,size: 20,)
-                        ],
-                      ),
-                    );
+                    final accountNumber = "987878t8t8";
+                    final paymentMethod = "Bank Transfer";
+                    final amountPaid = "c 2050";
 
 
                     return DataRow(
@@ -294,21 +254,17 @@ class _PayOutsState extends State<PayOuts> {
                         },
                         cells: [
                           DataCell(
-                            Text(sNo),
+                            Text(transactionId),
                           ),
                           DataCell(
-                            Text(empId),
+                            Text(date),
                           ),
                           DataCell(
-                            image
-                          ),
-                          DataCell(
-                              Container( child: Text(name))),
+                              Container( child: Text(time))),
                           DataCell(Container( child: Text(mobileNumber))),
-                          DataCell(Container( child: Text(gender,))),
-                          DataCell(Container( child: Text(orderDeliverd))),
-                          DataCell(Text(orderDeliverd)),
-                          DataCell(sendPayment),
+                          DataCell(Container( child: Text(accountNumber,))),
+                          DataCell(Container( child: Text(paymentMethod))),
+                          DataCell(Text(amountPaid)),
 
                         ]);
                   }),

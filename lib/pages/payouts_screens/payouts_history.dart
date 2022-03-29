@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:snapdash_admin/base_home_page.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/pages/orders_screens/widgets/drop_down_widget.dart';
-import 'package:snapdash_admin/pages/payouts_screens/payouts_history.dart';
+import 'package:snapdash_admin/pages/payouts_screens/agent_payment_details.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
-class PayOuts extends StatefulWidget {
-  const PayOuts({Key? key}) : super(key: key);
+class PayOutHistory extends StatefulWidget {
+  const PayOutHistory({Key? key}) : super(key: key);
 
   @override
-  State<PayOuts> createState() => _PayOutsState();
+  State<PayOutHistory> createState() => _PayOutHistoryState();
 }
 
-class _PayOutsState extends State<PayOuts> {
+class _PayOutHistoryState extends State<PayOutHistory> {
   DateTime selectedDate = DateTime.now();
 
   Future<void> _selectDate(BuildContext context) async {
@@ -25,6 +25,7 @@ class _PayOutsState extends State<PayOuts> {
         selectedDate = picked;
       });
   }
+
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
@@ -48,8 +49,8 @@ class _PayOutsState extends State<PayOuts> {
                               SizedBox(width: 10,),
                               InkWell(
                                 onTap:(){
-                                  // TakePhoto(ImageSource.gallery,insidePic!);
                                   NavigationService().pop();
+                                  // TakePhoto(ImageSource.gallery,insidePic!);
                                 },
                                 child: Text(
                                   "Payouts",
@@ -64,7 +65,7 @@ class _PayOutsState extends State<PayOuts> {
                                 thickness: 1.25,
                               ),
                               Text(
-                                "View Agent List",
+                                "Payouts History",
                                 style: TextStyle(
                                     color: AppColors.appColor,
                                     fontSize: 14,
@@ -123,34 +124,7 @@ class _PayOutsState extends State<PayOuts> {
                             ),
                           ],
                         ),
-                        GestureDetector(
-                          onTap: (){
-                            // _openAddProduct();
-                            NavigationService().navigatePage(PayOutHistory());
-                          },
-                          child: Container(
-                              height: 50,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              decoration: BoxDecoration(
-                                  color: AppColors.appColor,
-                                  borderRadius: BorderRadius.circular(6),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        offset: Offset(0, 1),
-                                        blurRadius: 2,
-                                        spreadRadius: 0,
-                                        color:AppColors.appColor)
-                                  ]),
-                              child: Center(
-                                child:  Text("View Payment History",
-                                    style: TextStyle(
-                                      color: AppColors.whitecolor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    )),
-                              )),
-                        )
+                        Container()
                       ],
                     ),
                   ),
@@ -248,19 +222,19 @@ class _PayOutsState extends State<PayOuts> {
                   dataRowHeight: 70,
                   headingRowColor: MaterialStateColor.resolveWith((states) {return AppColors.lightblue;},),
                   columns: [
-                    DataColumn(label:Text('S.NO',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('EmpID',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label:Text('Transaction ID',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     DataColumn(label: Text('Agent Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     DataColumn(label: Text('Agent Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     DataColumn(label: Text('Mobile Number',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     DataColumn(label: Text('Gender',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Orders Delivered',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     DataColumn(label: Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Send Payment',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                   ],
                   rows: List.generate(3, (index) {
-                    final sNo = "23";
-                    final empId = "#12344";
+                    final transactionId = "23";
+                    final date = "29-12-2022";
                     final image=CircleAvatar(
                       backgroundColor: AppColors.red,
                       radius: 25,
@@ -268,24 +242,9 @@ class _PayOutsState extends State<PayOuts> {
                     final name = "hitler";
                     final mobileNumber = "989898988988";
                     final gender = "Male";
-                    final orderDeliverd = "250";
+                    final paymentMethod = "Bank Transfer";
+                    final view=Icon(Icons.remove_red_eye_outlined,size: 18,);
                     final grandTotal = "c 2050";
-                    final sendPayment = Container(
-                      padding: EdgeInsets.all(10),
-                      alignment: Alignment.center,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.bgpink,
-                        borderRadius: BorderRadius.circular(20)
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text("Send",style: AppColors.titleRed,),
-                          Icon(Icons.send,color: AppColors.red,size: 20,)
-                        ],
-                      ),
-                    );
 
 
                     return DataRow(
@@ -294,21 +253,28 @@ class _PayOutsState extends State<PayOuts> {
                         },
                         cells: [
                           DataCell(
-                            Text(sNo),
+                            Text(transactionId),
                           ),
                           DataCell(
-                            Text(empId),
+                            Text(date),
                           ),
                           DataCell(
-                            image
+                              image
                           ),
                           DataCell(
                               Container( child: Text(name))),
                           DataCell(Container( child: Text(mobileNumber))),
                           DataCell(Container( child: Text(gender,))),
-                          DataCell(Container( child: Text(orderDeliverd))),
-                          DataCell(Text(orderDeliverd)),
-                          DataCell(sendPayment),
+                          DataCell(Container( child: Text(paymentMethod))),
+                          DataCell(
+                              InkWell(
+                                onTap: (){
+                                  NavigationService().navigatePage(AgentPaymentDetails());
+                                },
+                                  child: view)
+                          )
+                          ,
+                          DataCell(Text(grandTotal)),
 
                         ]);
                   }),

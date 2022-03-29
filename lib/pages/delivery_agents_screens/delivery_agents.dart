@@ -169,6 +169,7 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
             right: 70,
             child: Container(
               height: MediaQuery.of(context).size.height*0.7,
+              clipBehavior: Clip.antiAliasWithSaveLayer,
 
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -225,7 +226,7 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                     final WorkingStatus = "Active";
                     final view = Icon(Icons.remove_red_eye_outlined);
                     final actions = Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         InkWell(
                           onTap:(){

@@ -48,7 +48,7 @@ class _DropDownWidgetState extends State<DropDownWidget> {
         icon: const Icon(
           Icons.keyboard_arrow_down,
           size: 15,
-          color: Color(0xFF818181),
+          color:Colors.red,
         ),
         items: items.map((String items) {
           return DropdownMenuItem(
@@ -56,7 +56,7 @@ class _DropDownWidgetState extends State<DropDownWidget> {
             child: Text(
               items,
               style: TextStyle(
-                  color: AppColors.black,
+                  color: AppColors.red,
                   fontWeight: FontWeight.w400,
                   fontSize: 16),
             ),

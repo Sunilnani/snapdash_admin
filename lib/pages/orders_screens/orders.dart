@@ -41,14 +41,14 @@ class _OrdersState extends State<Orders> {
                   height: MediaQuery.of(context).size.height*0.3,
                   color: AppColors.bgpink,
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 58.0,left: 70,right: 70),
+                    padding: const EdgeInsets.only(bottom: 100,left: 70,right: 70),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IntrinsicHeight(
                           child: Row(
                             children: [
-                              Icon(Icons.water_damage_rounded,size: 18,),
+                              Icon(Icons.water_damage_rounded,size: 20,),
                               SizedBox(width: 10,),
                               InkWell(
                                 onTap:(){
@@ -125,7 +125,8 @@ class _OrdersState extends State<Orders> {
 
                             ),
                           ],
-                        )
+                        ),
+                        Container()
                       ],
                     ),
                   ),
@@ -137,94 +138,60 @@ class _OrdersState extends State<Orders> {
               top:160,
               left: 70,
               right: 70,
-              child:  Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child:   Row(
                 children: [
-                  Row(
+                  Column(
+                    crossAxisAlignment:
+                    CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Status",
-                            style: TextStyle(
-                                color: AppColors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          DropDownWidget(Width: 200,),
-                        ],
+                      Text(
+                        "Status",
+                        style: TextStyle(
+                            color: AppColors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
                       ),
-                      SizedBox(width: 70,),
-                      Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Date To Filter",
-                            style: TextStyle(
-                                color: AppColors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          InkWell(
-                              onTap: () => _selectDate(context),
-                              child: Container(
-                                alignment: Alignment.center,
-                                height: 50,
-                                width:200,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.rectangle,
-                                    borderRadius: BorderRadius.circular(4),
-                                    color: AppColors.whitecolor,
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Color(0xFFD1D5DB),
-                                    )),
-                                child: selectedDate==null?Text("select date to filter"):Text("${selectedDate.toLocal()}".split(' ')[0]),
-                              )
-                          ),
-
-                        ],
+                      SizedBox(
+                        height: 5,
                       ),
+                      DropDownWidget(Width: 200,),
                     ],
                   ),
+                  SizedBox(width: 70,),
+                  Column(
+                    crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Date To Filter",
+                        style: TextStyle(
+                            color: AppColors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      InkWell(
+                          onTap: () => _selectDate(context),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 50,
+                            width:200,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(4),
+                                color: AppColors.whitecolor,
+                                border: Border.all(
+                                  width: 1,
+                                  color: Color(0xFFD1D5DB),
+                                )),
+                            child: selectedDate==null?Text("select date to filter"):Text("${selectedDate.toLocal()}".split(' ')[0]),
+                          )
+                      ),
 
-                  InkWell(
-                    onTap: (){
-                      // _openAddProduct();
-                     // NavigationService().navigatePage(AddVehicle());
-                    },
-                    child: Container(
-                        height: 45,
-                        width: 90,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            color: AppColors.appColor,
-                            borderRadius: BorderRadius.circular(6),
-                            // boxShadow: [
-                            //   BoxShadow(
-                            //       offset: Offset(0, 1),
-                            //       blurRadius: 2,
-                            //       spreadRadius: 0,
-                            //       color:AppColors.appColor)
-                            // ]
-                        ),
-                        child: Text("Filter",
-                            style: TextStyle(
-                              color: AppColors.whitecolor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ))),
-                  )
-
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -234,8 +201,10 @@ class _OrdersState extends State<Orders> {
               top: 270,
               left: 70,
               right: 70,
+              bottom: 30,
               child: Container(
                 height: MediaQuery.of(context).size.height*0.7,
+                clipBehavior: Clip.antiAliasWithSaveLayer,
 
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -248,82 +217,137 @@ class _OrdersState extends State<Orders> {
                           color: Colors.black.withOpacity(0.4))
                     ]
                 ),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      color: AppColors.whitecolor,
-                      borderRadius: BorderRadius.circular(5),
-                      boxShadow: [
-                        BoxShadow(
-                            offset: Offset(0, 3),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            color: Colors.black.withOpacity(0.3))
-                      ]),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        color: AppColors.lightblue,
-                        height: 60,
-                        //alignment: Alignment.center,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                            Text('Order Id',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                            Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                            Text('Category name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                            Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                            Text('Order Status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                            Text('Grand total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                            Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                            Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10,),
-                      ListView.builder(
-                          padding: EdgeInsets.only(
-                            top: 20,
+                child: DataTable(
+                  // columnSpacing: 38.0,
+                  showCheckboxColumn: false,
+                  dataRowHeight: 70,
+                  headingRowColor: MaterialStateColor.resolveWith((states) {return AppColors.lightblue;},),
+                  columns: [
+                    DataColumn(label:Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('OrderID',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Category Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Order Styatus',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    DataColumn(label: Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                  ],
+                  rows: List.generate(3, (index) {
+                    final date = "23-10-2022";
+                    final orderId = "#12344";
+                    final name = "hitler";
+                    final categoryName = "Bokks";
+                    final paymentMethod = "Cash";
+                    final orderSttatus = "Ready to PickUp";
+                    final grandTotal = "c 20";
+                    final view = Icon(Icons.remove_red_eye_outlined);
+                    final orderPicked = "peter st";
+
+
+                    return DataRow(
+                        onSelectChanged: (bool){
+                          NavigationService().navigatePage(OrderDetails());
+                        },
+                        cells: [
+                          DataCell(
+                            Text(date),
                           ),
-                          shrinkWrap: true,
-                         // separatorBuilder: (_, __) => Divider(height: 2,color: Colors.white,),
-                          physics: NeverScrollableScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          itemCount: 5,
+                          DataCell(
+                            Text(orderId),
+                          ),
+                          DataCell(
+                            Text(name),
+                          ),
+                          DataCell(
+                              Container( child: Text(categoryName))),
+                          DataCell(Container( child: Text(paymentMethod))),
+                          DataCell(Container( child: Text(orderSttatus,style: AppColors.subheadingred,))),
+                          DataCell(Container( child: Text(grandTotal))),
+                          DataCell(view),
+                          DataCell(Text(orderPicked)),
 
-                          itemBuilder: (context, index) {
-                            return InkWell(
-                              onTap:(){
-                                NavigationService().navigatePage(OrderDetails());
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(bottom: 40.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text("25--3-22"),
-                                    Text("#123"),
-                                    Text("Mike"),
-                                    Text("Books"),
-                                    Text("Cash"),
-                                    Text("Ready to pick",style: TextStyle(color: AppColors.red),),
-                                    Text("c 20"),
-                                    Icon(Icons.remove_red_eye_outlined,size: 18,color: Colors.black,),
-                                    Text("Mike Jacob"),
-
-                                  ],
-                                ),
-                              ),
-                            );
-                          })
-
-
-                    ],
-                  ),
+                        ]);
+                  }),
                 ),
+
+
+                // child: Container(
+                //   width: double.infinity,
+                //   decoration: BoxDecoration(
+                //       shape: BoxShape.rectangle,
+                //       color: AppColors.whitecolor,
+                //       borderRadius: BorderRadius.circular(5),
+                //       boxShadow: [
+                //         BoxShadow(
+                //             offset: Offset(0, 3),
+                //             blurRadius: 10,
+                //             spreadRadius: 0,
+                //             color: Colors.black.withOpacity(0.3))
+                //       ]),
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Container(
+                //         color: AppColors.lightblue,
+                //         height: 60,
+                //         //alignment: Alignment.center,
+                //         child: Row(
+                //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //           children: [
+                //             Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //             Text('Order Id',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //             Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //             Text('Category name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //             Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //             Text('Order Status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //             Text('Grand total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //             Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //             Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                //           ],
+                //         ),
+                //       ),
+                //       SizedBox(height: 10,),
+                //       ListView.builder(
+                //           padding: EdgeInsets.only(
+                //             top: 20,
+                //           ),
+                //           shrinkWrap: true,
+                //          // separatorBuilder: (_, __) => Divider(height: 2,color: Colors.white,),
+                //           physics: NeverScrollableScrollPhysics(),
+                //           scrollDirection: Axis.vertical,
+                //           itemCount: 5,
+                //
+                //           itemBuilder: (context, index) {
+                //             return InkWell(
+                //               onTap:(){
+                //                 NavigationService().navigatePage(OrderDetails());
+                //               },
+                //               child: Padding(
+                //                 padding: const EdgeInsets.only(bottom: 40.0),
+                //                 child: Row(
+                //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //                   children: [
+                //                     Text("25--3-22"),
+                //                     Text("#123"),
+                //                     Text("Mike"),
+                //                     Text("Books"),
+                //                     Text("Cash"),
+                //                     Text("Ready to pick",style: TextStyle(color: AppColors.red),),
+                //                     Text("c 20"),
+                //                     Icon(Icons.remove_red_eye_outlined,size: 18,color: Colors.black,),
+                //                     Text("Mike Jacob"),
+                //
+                //                   ],
+                //                 ),
+                //               ),
+                //             );
+                //           })
+                //
+                //
+                //     ],
+                //   ),
+                // ),
               ),
             ),
 

@@ -33,6 +33,9 @@ class AppColors{
   static Color lightblue=Color(0xFFF6F9FC);
   static TextStyle headingstyle= TextStyle(color:AppColors.black,fontSize: 22,fontWeight: FontWeight.w600);
   static TextStyle subheadingred= TextStyle(color:AppColors.red,fontSize: 16,fontWeight: FontWeight.w500);
+  static TextStyle titleRed= TextStyle(color: AppColors.red,fontWeight: FontWeight.w600,fontSize: 18);
+  static TextStyle minblackSize=TextStyle(color: AppColors.black.withOpacity(0.6),fontSize: 14,fontWeight: FontWeight.w600);
+  //static TextStyle subheading= TextStyle(color:AppColors.black,fontSize: 16,fontWeight: FontWeight.w500);
 
 
 

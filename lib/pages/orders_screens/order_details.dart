@@ -26,7 +26,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     IntrinsicHeight(
                       child: Row(
                         children: [
-                          Icon(Icons.water_damage_rounded,size: 18,),
+                          Icon(Icons.water_damage_rounded,size: 20,),
                           SizedBox(width: 10,),
                           InkWell(
                             onTap:(){
@@ -367,84 +367,172 @@ class _OrderDetailsState extends State<OrderDetails> {
                         ],
                       ),
                       SizedBox(height: 50,),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            color: AppColors.lightblue,
-                            height: 60,
-                            //alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                                Text('Order Id',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                                Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                                Text("Order Type",style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                                Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                                Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                                Text('Order Status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                                Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                                Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 10,),
-                          ListView.builder(
-                              padding: EdgeInsets.only(
-                                top: 20,
-                              ),
-                              shrinkWrap: true,
-                              // separatorBuilder: (_, __) => Divider(height: 2,color: Colors.white,),
-                              physics: NeverScrollableScrollPhysics(),
-                              scrollDirection: Axis.vertical,
-                              itemCount: 2,
-
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  onTap:(){
-                                   // NavigationService().navigatePage(OrderDetails());
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 40.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text("25--3-22"),
-                                        Text("#123"),
-                                        CircleAvatar(
-                                          backgroundColor: Colors.yellow,
-                                          radius: 20,
-                                        ),
-                                        Text("Books"),
-                                        Text("Mike"),
-                                        Text("Cash"),
-                                        Text("Ready to pick",style: TextStyle(color: AppColors.red),),
-                                        Text("Mike Jacob"),
-                                        Text("c 20"),
+                      Container(
+                        width: double.infinity,
+                        child: DataTable(
+                          // columnSpacing: 38.0,
+                          showCheckboxColumn: false,
+                          dataRowHeight: 70,
+                          headingRowColor: MaterialStateColor.resolveWith((states) {return AppColors.lightblue;},),
+                          columns: [
+                            DataColumn(label:Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                            DataColumn(label:Text('OrderID',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                            DataColumn(label: Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                            DataColumn(label: Text('OrderType',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                            DataColumn(label: Text('UserName',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                            DataColumn(label: Text('PaymentMethod',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                            DataColumn(label: Text('OrderStatus',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                            DataColumn(label: Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                            DataColumn(label: Text('OrderPicked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                          ],
+                          rows: List.generate(2, (index) {
+                            final date = "23-12-2022";
+                            final orderId="123";
+                            final image = "image";
+                            final orderType = "Electronics";
+                            final Nmae = "Sunil";
+                            final paymentMethod = "Cod";
+                            final orderStatus = "Delivered";
+                            final grandTotal = "c 20";
+                            final orderPicked="peter st";
 
 
-                                      ],
+                            return DataRow(
+                                onSelectChanged: (bool){
+                                 // NavigationService().navigatePage(DeliveryAgentDetails());
+                                },
+                                cells: [
+                                  DataCell(
+                                    Text(date),
+                                  ),
+                                  DataCell(
+                                    Text(orderId),
+                                  ),
+                                  DataCell(
+                                    Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Container(
+                                        height: 40,
+                                        width: 40,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.rectangle,
+                                            borderRadius: BorderRadius.circular(4),
+                                            color: AppColors.appColor),
+                                        // child: ImageWidget(
+                                        //     imageUrl: URLS.buildImageUrl(
+                                        //         "${image}"))
+                                        child: Text(image),
+                                      ),
                                     ),
                                   ),
-                                );
-                              }),
-                          Divider(
-                            color: AppColors.grey,
-                            height: 2,
-                          ),
-                          SizedBox(height: 10,),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 130.0),
-                            child: Align(
-                              alignment: Alignment.bottomRight,
-                                child: Text("Total Amount     c40",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w500),)),
-                          )
+                                  DataCell(
+                                    Text(orderType),
+                                  ),
+                                  DataCell(
+                                      Container( child: Text(Nmae))),
+                                  DataCell(Container( child: Text(paymentMethod))),
+                                  DataCell(Container( child: Text(orderStatus))),
+                                  DataCell(Container( child: Text(grandTotal))),
+                                  DataCell(Text(orderPicked)),
 
 
-                        ],
+                                ]);
+                          }),
+                        ),
                       ),
+                  Divider(
+                         color: AppColors.grey,
+                          height: 2,
+                        ),
+                        SizedBox(height: 10,),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 330.0,top: 30),
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                              child: Text("Total Amount     c40",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w500),)),
+                        )
+
+
+
+
+                      // Column(
+                      //   crossAxisAlignment: CrossAxisAlignment.start,
+                      //   children: [
+                      //     Container(
+                      //       color: AppColors.lightblue,
+                      //       height: 60,
+                      //       //alignment: Alignment.center,
+                      //       child: Row(
+                      //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      //         children: [
+                      //           Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //           Text('Order Id',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //           Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //           Text("Order Type",style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //           Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //           Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //           Text('Order Status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //           Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //           Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
+                      //
+                      //         ],
+                      //       ),
+                      //     ),
+                      //     SizedBox(height: 10,),
+                      //     ListView.builder(
+                      //         padding: EdgeInsets.only(
+                      //           top: 20,
+                      //         ),
+                      //         shrinkWrap: true,
+                      //         // separatorBuilder: (_, __) => Divider(height: 2,color: Colors.white,),
+                      //         physics: NeverScrollableScrollPhysics(),
+                      //         scrollDirection: Axis.vertical,
+                      //         itemCount: 2,
+                      //
+                      //         itemBuilder: (context, index) {
+                      //           return InkWell(
+                      //             onTap:(){
+                      //              // NavigationService().navigatePage(OrderDetails());
+                      //             },
+                      //             child: Padding(
+                      //               padding: const EdgeInsets.only(bottom: 40.0),
+                      //               child: Row(
+                      //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      //                 children: [
+                      //                   Text("25--3-22"),
+                      //                   Text("#123"),
+                      //                   CircleAvatar(
+                      //                     backgroundColor: Colors.yellow,
+                      //                     radius: 20,
+                      //                   ),
+                      //                   Text("Books"),
+                      //                   Text("Mike"),
+                      //                   Text("Cash"),
+                      //                   Text("Ready to pick",style: TextStyle(color: AppColors.red),),
+                      //                   Text("Mike Jacob"),
+                      //                   Text("c 20"),
+                      //
+                      //
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //           );
+                      //         }),
+                      //     Divider(
+                      //       color: AppColors.grey,
+                      //       height: 2,
+                      //     ),
+                      //     SizedBox(height: 10,),
+                      //     Padding(
+                      //       padding: const EdgeInsets.only(right: 130.0),
+                      //       child: Align(
+                      //         alignment: Alignment.bottomRight,
+                      //           child: Text("Total Amount     c40",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w500),)),
+                      //     )
+                      //
+                      //
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),

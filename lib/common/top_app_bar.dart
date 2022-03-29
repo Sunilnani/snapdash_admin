@@ -5,7 +5,7 @@ import 'package:snapdash_admin/pages/active_areas_screens/active_orders.dart';
 import 'package:snapdash_admin/pages/delivery_agents_screens/delivery_agents.dart';
 import 'package:snapdash_admin/pages/my_vehicles_screens/my_vehicles.dart';
 import 'package:snapdash_admin/pages/orders_screens/orders.dart';
-import 'package:snapdash_admin/pages/payouts_screens/payouts.dart';
+import 'package:snapdash_admin/pages/payouts_screens/statistics.dart';
 import 'package:snapdash_admin/pages/users_screens/users.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 
@@ -92,7 +92,7 @@ class _TopAppBarState extends State<TopAppBar> {
                             NavigationService().navigatePage(Users());
                           }
                           if(index==4){
-                            NavigationService().navigatePage(PayOuts());
+                            NavigationService().navigatePage(Statistics());
                           }
                           if(index==5){
                             NavigationService().navigatePage(ActiveAreas());

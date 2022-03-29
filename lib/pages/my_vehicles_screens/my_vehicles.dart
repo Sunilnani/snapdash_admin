@@ -163,7 +163,7 @@ class _MyVehiclesState extends State<MyVehicles> {
               right: 70,
               child: Container(
                 height: MediaQuery.of(context).size.height*0.7,
-
+                clipBehavior: Clip.antiAliasWithSaveLayer,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
