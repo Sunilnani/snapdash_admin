@@ -3,6 +3,7 @@ import 'package:snapdash_admin/base_home_page.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/pages/orders_screens/widgets/drop_down_widget.dart';
 import 'package:snapdash_admin/pages/payouts_screens/payouts_history.dart';
+import 'package:snapdash_admin/pages/payouts_screens/send_payouts.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 class PayOuts extends StatefulWidget {
   const PayOuts({Key? key}) : super(key: key);
@@ -308,7 +309,12 @@ class _PayOutsState extends State<PayOuts> {
                           DataCell(Container( child: Text(gender,))),
                           DataCell(Container( child: Text(orderDeliverd))),
                           DataCell(Text(orderDeliverd)),
-                          DataCell(sendPayment),
+                          DataCell(
+                              InkWell(
+                                onTap: (){
+                                  NavigationService().navigatePage(SendPayOuts());
+                                },
+                                  child: sendPayment)),
 
                         ]);
                   }),

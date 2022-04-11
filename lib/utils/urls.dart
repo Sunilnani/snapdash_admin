@@ -1,5 +1,5 @@
 class URLS {
-  static String baseUrl ="http://51.75.202.245:8003";
+  static String baseUrl =   "http://51.89.21.83:5001";
   static String login = "/api/v1/login/";
   static String verifyOTP = "/api/v1/verify_otp/";
 
@@ -19,12 +19,15 @@ class URLS {
 
   static String weeklyStatistics ="/api/v1/my_earnings/";
   static String dailyEarnings="/api/v1/my_earnings/?today=3";
-
-
-
   static String myAccountProfile="/api/v1/profile/";
   static String editProfile="/api/v1/profile/";
 
+
+
+
+  static String vehiclesList="/api/v1/vehicles/";
+  static String vehicleDetails(String vehicleId)=>"/api/v1/vehicle_details/?vehicle_id=$vehicleId";
+  static String addVehicle="/api/v1/vehicles/";
 
 
   static String parseImage(String? url) {

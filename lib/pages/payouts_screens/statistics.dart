@@ -161,7 +161,7 @@ class _StatisticsState extends State<Statistics> {
 
 
                     Container(
-                      height: MediaQuery.of(context).size.height*0.4,
+                      height: MediaQuery.of(context).size.height*0.5,
                       width: 2,
                       color: AppColors.greylight,
                     ),
@@ -188,7 +188,7 @@ class _StatisticsState extends State<Statistics> {
                                 ]
                             ),
                           ),
-                          SizedBox(height: 30,),
+                          SizedBox(height: 50,),
                           Text("Overall Progress",style: AppColors.titleRed,),
                           SizedBox(height: 30,),
 

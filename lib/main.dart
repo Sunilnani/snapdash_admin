@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         NavigationService.routeObserver,
       ],
       navigatorKey: NavigationService.navigatorKey,
-      home: const MyVehicles(),
+      home: const LoginPage(),
 
     );
   }

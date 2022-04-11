@@ -1,9 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/base_home_page.dart';
+import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/vehicles_manager.dart';
+import 'package:snapdash_admin/models/vehicles/vehicles_model.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/pages/my_vehicles_screens/add_vehicles.dart';
 import 'package:snapdash_admin/pages/my_vehicles_screens/view_vehicle_details.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:snapdash_admin/utils/urls.dart';
 class MyVehicles extends StatefulWidget {
   const MyVehicles({Key? key}) : super(key: key);
 
@@ -12,6 +19,47 @@ class MyVehicles extends StatefulWidget {
 }
 
 class _MyVehiclesState extends State<MyVehicles> {
+  bool _fetching = false;
+
+  //PastOrders? pastOrders;
+
+  VechiclesList? vehicles;
+
+  Future<void> _fetchVehicles() async {
+    setState(() {
+      _fetching = true;
+    });
+    try {
+      final response = await vehicleManager.vehicles();
+
+      if (response.status == ResponseStatus.SUCCESS) {
+        Fluttertoast.showToast(msg: response.message);
+        print("------->past ${(response.data as VechiclesList).toJson()}");
+        setState(() {
+          vehicles = response.data;
+        });
+        setState(() {
+          _fetching=false;
+        });
+      } else {
+        Fluttertoast.showToast(msg: response.message);
+      }
+    } catch (err) {
+      print(err);
+      // run now once
+      setState(() {
+        _fetching = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _fetchVehicles();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
@@ -175,7 +223,7 @@ class _MyVehiclesState extends State<MyVehicles> {
                           color: Colors.black.withOpacity(0.4))
                     ]
                 ),
-                child: Container(
+                child:vehicles==null?CustomCircularProgressIndicator():Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
@@ -205,14 +253,30 @@ class _MyVehiclesState extends State<MyVehicles> {
                       DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                       DataColumn(label: Text('Actions',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     ],
-                    rows: List.generate(5, (index) {
+                    rows: List.generate(vehicles!.count.bitLength, (index) {
                       final sNO ="1";
-                      final image = "image";
-                      final brandName = "Hero Honda";
-                      final modelType = "passion plus";
-                      final modelNumber = "h2-0a12u3";
-                      final licencePlate = "Ap837388";
-                      final vehicleStatus = "status 0";
+                      final images=Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: CachedNetworkImageProvider(URLS.parseImage(vehicles!.data[index].vehicleImage ?? "",
+                              ),
+                            ),
+
+                          ),
+
+                      ));
+                      final image =CircleAvatar(
+                        radius: 25,
+                        backgroundImage: CachedNetworkImageProvider(URLS.parseImage(vehicles!.data[index].vehicleImage ?? "")),
+                      );
+                      final brandName = vehicles!.data[index].vehicleName;
+                      final modelType = vehicles!.data[index].modelType;
+                      final modelNumber = vehicles!.data[index].modelNumber;
+                      final licencePlate = vehicles!.data[index].licenceNumber;
+                      final vehicleStatus = vehicles!.data[index].vehicleStatus;
                       final view = Icon(Icons.remove_red_eye_outlined);
                       final actions = Row(
                                               mainAxisAlignment: MainAxisAlignment.center,
@@ -251,7 +315,7 @@ class _MyVehiclesState extends State<MyVehicles> {
 
                       return DataRow(
                           onSelectChanged: (bool){
-                            NavigationService().navigatePage(ViewVehicleDetails());
+                            NavigationService().navigatePage(ViewVehicleDetails(vehicleId: vehicles!.data[index].vehicleId,));
                           },
                           cells: [
                             DataCell(
@@ -269,10 +333,8 @@ class _MyVehiclesState extends State<MyVehicles> {
                                         shape: BoxShape.rectangle,
                                         borderRadius: BorderRadius.circular(4),
                                         color: AppColors.appColor),
-                                    // child: ImageWidget(
-                                    //     imageUrl: URLS.buildImageUrl(
-                                    //         "${image}"))
-                                  child: Text(image),
+                                    child: images
+
                                 ),
                               ),
                             ),
@@ -284,7 +346,7 @@ class _MyVehiclesState extends State<MyVehicles> {
 
                             DataCell(Container( child: Text(modelNumber))),
                             DataCell(Container( child: Text(licencePlate))),
-                            DataCell(Container( child: Text(vehicleStatus))),
+                            DataCell(Container( child: Text("${vehicleStatus}"))),
                             DataCell(Container( child: view)),
                             DataCell(Container( child: actions)),
 
