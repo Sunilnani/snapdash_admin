@@ -1,14 +1,72 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/base_home_page.dart';
+import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
+import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/orders_manager.dart';
+import 'package:snapdash_admin/models/orders_model/order_details_model.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 class OrderDetails extends StatefulWidget {
-  const OrderDetails({Key? key}) : super(key: key);
+ OrderDetails({required this.orderId});
+ final int? orderId;
 
   @override
   State<OrderDetails> createState() => _OrderDetailsState();
 }
 
 class _OrderDetailsState extends State<OrderDetails> {
+
+  OrderDetailsModel? orderDetails;
+
+  bool _fetching=false;
+  var address;
+  var deliveryAddress;
+
+  Future<void> _fetchOrderDetails() async {
+    setState(() {
+      _fetching = true;
+    });
+    print("..........responsed");
+    print("-------->order id is ${widget.orderId}");
+    final response = await ordersManager
+        .fetchOrderDetail(widget.orderId);
+    //print((response.data as OngoingOrderDetails).toJson());
+    print(response.data);
+    setState(() {
+      _fetching = false;
+    });
+
+    if (response.status == ResponseStatus.SUCCESS) {
+      Fluttertoast.showToast(msg: response.message);
+      setState(() {
+        orderDetails = response.data;
+      });
+
+      if(orderDetails != null){
+
+        setState(() {
+          address = orderDetails!.pickupAddress.split(",");
+         deliveryAddress=orderDetails!.deliveryAddress.split(",");
+        });
+      }
+
+      // print(orderDetails?.OrderDetails?.productImages);
+    } else {
+      Fluttertoast.showToast(msg: response.message);
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    _fetchOrderDetails();
+
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
@@ -30,6 +88,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                           SizedBox(width: 10,),
                           InkWell(
                             onTap:(){
+                              NavigationService().pop();
                               // TakePhoto(ImageSource.gallery,insidePic!);
                             },
                             child: Text(
@@ -104,7 +163,7 @@ class _OrderDetailsState extends State<OrderDetails> {
               top: 180,
               left: 70,
               right: 70,
-              child: Container(
+              child: orderDetails == null? CustomCircularProgressIndicator():Container(
                 height: MediaQuery.of(context).size.height*0.7,
                 padding: EdgeInsets.only(top: 40,bottom: 30),
 
@@ -144,7 +203,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Order ID: #123",style: TextStyle(color: AppColors.black
+                                Text("${orderDetails!.orderId}",style: TextStyle(color: AppColors.black
                                     ,fontSize: 20,fontWeight: FontWeight.w600),),
                                 SizedBox(height: 15,),
                                 Text("Ordered on OCTOBER 25,2022",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
@@ -153,7 +212,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Tome of Order placed",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                    Text("Time of Order placed",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
                                     Text("11:00 Am",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                   ],
                                 ),
@@ -191,179 +250,9 @@ class _OrderDetailsState extends State<OrderDetails> {
                             ),
                           ),
 
-                          Container(
-                            height: MediaQuery.of(context).size.height*0.32,
-                            width: MediaQuery.of(context).size.width*0.26,
-                            padding: EdgeInsets.only(top: 20,left: 35,right: 35),
+                         pickUpDetails(),
+                        deliveryDetails()
 
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                      offset: Offset(0, 3),
-                                      blurRadius: 5,
-                                      spreadRadius: 0,
-                                      color: Colors.black.withOpacity(0.4))
-                                ]
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Pick-Up-Address",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w600),),
-                                SizedBox(height: 30,),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Customer Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("Sunil",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Phone Number",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("9998989898",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Email ID",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("sunil123@gmail.com",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Address Line",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("Anna Nagar",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Flat / Building Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("21-10/2",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Street Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("Nagar",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Pincode",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("002030",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-
-
-                              ],
-                            ),
-                          ),
-
-                          Container(
-                            height: MediaQuery.of(context).size.height*0.32,
-                            width: MediaQuery.of(context).size.width*0.26,
-                            padding: EdgeInsets.only(top: 20,left: 35,right: 35),
-
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                      offset: Offset(0, 3),
-                                      blurRadius: 5,
-                                      spreadRadius: 0,
-                                      color: Colors.black.withOpacity(0.4))
-                                ]
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Pick-Up-Address",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w600),),
-                                SizedBox(height: 30,),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Customer Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("Sunil",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Phone Number",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("9998989898",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Email ID",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("sunil123@gmail.com",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Address Line",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("Anna Nagar",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Flat / Building Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("21-10/2",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Street Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("Nagar",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 15,),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Pincode",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                    Text("002030",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-
-
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                       SizedBox(height: 50,),
@@ -451,88 +340,6 @@ class _OrderDetailsState extends State<OrderDetails> {
                             alignment: Alignment.bottomRight,
                               child: Text("Total Amount     c40",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w500),)),
                         )
-
-
-
-
-                      // Column(
-                      //   crossAxisAlignment: CrossAxisAlignment.start,
-                      //   children: [
-                      //     Container(
-                      //       color: AppColors.lightblue,
-                      //       height: 60,
-                      //       //alignment: Alignment.center,
-                      //       child: Row(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //         children: [
-                      //           Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //           Text('Order Id',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //           Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //           Text("Order Type",style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //           Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //           Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //           Text('Order Status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //           Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //           Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                      //
-                      //         ],
-                      //       ),
-                      //     ),
-                      //     SizedBox(height: 10,),
-                      //     ListView.builder(
-                      //         padding: EdgeInsets.only(
-                      //           top: 20,
-                      //         ),
-                      //         shrinkWrap: true,
-                      //         // separatorBuilder: (_, __) => Divider(height: 2,color: Colors.white,),
-                      //         physics: NeverScrollableScrollPhysics(),
-                      //         scrollDirection: Axis.vertical,
-                      //         itemCount: 2,
-                      //
-                      //         itemBuilder: (context, index) {
-                      //           return InkWell(
-                      //             onTap:(){
-                      //              // NavigationService().navigatePage(OrderDetails());
-                      //             },
-                      //             child: Padding(
-                      //               padding: const EdgeInsets.only(bottom: 40.0),
-                      //               child: Row(
-                      //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //                 children: [
-                      //                   Text("25--3-22"),
-                      //                   Text("#123"),
-                      //                   CircleAvatar(
-                      //                     backgroundColor: Colors.yellow,
-                      //                     radius: 20,
-                      //                   ),
-                      //                   Text("Books"),
-                      //                   Text("Mike"),
-                      //                   Text("Cash"),
-                      //                   Text("Ready to pick",style: TextStyle(color: AppColors.red),),
-                      //                   Text("Mike Jacob"),
-                      //                   Text("c 20"),
-                      //
-                      //
-                      //                 ],
-                      //               ),
-                      //             ),
-                      //           );
-                      //         }),
-                      //     Divider(
-                      //       color: AppColors.grey,
-                      //       height: 2,
-                      //     ),
-                      //     SizedBox(height: 10,),
-                      //     Padding(
-                      //       padding: const EdgeInsets.only(right: 130.0),
-                      //       child: Align(
-                      //         alignment: Alignment.bottomRight,
-                      //           child: Text("Total Amount     c40",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w500),)),
-                      //     )
-                      //
-                      //
-                      //   ],
-                      // ),
                     ],
                   ),
                 ),
@@ -541,6 +348,186 @@ class _OrderDetailsState extends State<OrderDetails> {
 
           ],
         )
+    );
+  }
+  Widget pickUpDetails(){
+    return  Container(
+      height: MediaQuery.of(context).size.height*0.32,
+      width: MediaQuery.of(context).size.width*0.26,
+      padding: EdgeInsets.only(top: 20,left: 35,right: 35),
+
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+                offset: Offset(0, 3),
+                blurRadius: 5,
+                spreadRadius: 0,
+                color: Colors.black.withOpacity(0.4))
+          ]
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Pick-Up-Address",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w600),),
+          SizedBox(height: 50,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Customer Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text("${orderDetails!.userName}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            ],
+          ),
+          SizedBox(height: 15,),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Phone Number",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text("${orderDetails!.userNumber}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            ],
+          ),
+          SizedBox(height: 15,),
+
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Text("Email ID",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+          //     Text("sunil123@gmail.com",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+          //   ],
+          // ),
+          // SizedBox(height: 15,),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Area",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text(address[0],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            ],
+          ),
+          SizedBox(height: 15,),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Flat / Building Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text(address[1],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            ],
+          ),
+          SizedBox(height: 15,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Street Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text(address[2],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            ],
+          ),
+          SizedBox(height: 15,),
+
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Text("Pincode",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+          //     Text("002030",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+          //   ],
+          // ),
+
+
+        ],
+      ),
+    );
+  }
+
+  Widget deliveryDetails(){
+    return  Padding(
+      padding: const EdgeInsets.only(top: 5.0),
+      child: Container(
+        height: MediaQuery.of(context).size.height*0.32,
+        width: MediaQuery.of(context).size.width*0.26,
+        padding: EdgeInsets.only(top: 20,left: 35,right: 35),
+
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                  offset: Offset(0, 3),
+                  blurRadius: 5,
+                  spreadRadius: 0,
+                  color: Colors.black.withOpacity(0.4))
+            ]
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Delivery-Address",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w600),),
+            SizedBox(height: 50,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Customer Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text(orderDetails!.receiverName??"No name",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Phone Number",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text("${orderDetails!.receiverNumber}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
+
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     Text("Email ID",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+            //     Text("sunil123@gmail.com",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            //   ],
+            // ),
+           // SizedBox(height: 15,),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Area",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text(deliveryAddress[0]??"",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Street",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text(deliveryAddress[1]??"",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("City",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text(deliveryAddress[2]??"",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
+
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     Text("Pincode",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+            //     Text("002030",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            //   ],
+            // ),
+
+
+          ],
+        ),
+      ),
     );
   }
 }

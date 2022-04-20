@@ -1,22 +1,116 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:snapdash_admin/base_home_page.dart';
+import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/agents_manager.dart';
+import 'package:snapdash_admin/models/agentsModels/agent_list_model.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/pages/delivery_agents_screens/add_delivery_agent/add_delivery_agent.dart';
 import 'package:snapdash_admin/pages/delivery_agents_screens/delivery_agent_details.dart';
 import 'package:snapdash_admin/pages/delivery_agents_screens/update_deliveryAgent.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:snapdash_admin/utils/urls.dart';
 class DeliveryAgents extends StatefulWidget {
-  const DeliveryAgents({Key? key}) : super(key: key);
 
   @override
   State<DeliveryAgents> createState() => _DeliveryAgentsState();
 }
 
 class _DeliveryAgentsState extends State<DeliveryAgents> {
+
+
+
+  bool _fetching = false;
+
+  //PastOrders? pastOrders;
+
+  AgentsListModel? agents;
+
+  Future<void> _fetchAgents() async {
+    setState(() {
+      _fetching = true;
+    });
+    try {
+      final response = await agentManager.agentsList();
+
+      if (response.status == ResponseStatus.SUCCESS) {
+        Fluttertoast.showToast(msg: response.message);
+        print("------->Agents ${(response.data as AgentsListModel).toJson()}");
+        setState(() {
+          agents = response.data;
+        });
+        setState(() {
+          _fetching=false;
+        });
+      } else {
+        Fluttertoast.showToast(msg: response.message);
+      }
+    } catch (err) {
+      print(err);
+      // run now once
+      setState(() {
+        _fetching = false;
+      });
+    }
+  }
+
+  bool _loading = false;
+
+  Future<void> deleteAgent(dynamic agentId ,int index) async {
+
+
+
+    final data = {
+
+      "agent_id":agentId,
+
+    };
+
+    setState(() {
+      _loading = true;
+    });
+
+    final response = await agentManager.deleteAgent(data);
+
+    if (response.status == ResponseStatus.SUCCESS) {
+      Fluttertoast.showToast(msg: response.message);
+      setState(() {
+        agents!.data.removeAt(index);
+      });
+      _fetchAgents();
+
+      // Navigator.of(context).pop();
+    } else {
+      Fluttertoast.showToast(msg: response.message);
+      print("---------------------##########${response.status}");
+
+    }
+
+    setState(() {
+      _loading = false;
+    });
+  }
+
+
+
+  Future<void> _openAddAgents({MyAgentsList? agents})async{
+    await NavigationService().navigatePage(AddDeliveryAgent(agentData:agents));
+    await _fetchAgents();
+
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchAgents();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,10 +209,11 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                       SizedBox(
                         width: 100,
                       ),
-                      GestureDetector(
-                        onTap: (){
+                      InkWell(
+                        onTap: ()async{
                          // _openAddProduct();
-                           NavigationService().navigatePage(AddDeliveryAgent());
+                          await NavigationService().navigatePage(AddDeliveryAgent());
+                          _fetchAgents();
                         },
                         child: Container(
                             height: 50,
@@ -182,7 +277,7 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                         color: Colors.black.withOpacity(0.4))
                   ]
               ),
-              child: Container(
+              child: agents==null?CustomCircularProgressIndicator():Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
                     shape: BoxShape.rectangle,
@@ -216,13 +311,25 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                     DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     DataColumn(label: Text('Actions',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                   ],
-                  rows: List.generate(3, (index) {
-                    final empID = "123";
-                    final image = "image";
-                    final name = "hitler";
-                    final emailID = "Sunil345@gmail.com";
-                    final mobileNumber = "9999999999";
-                    final TotalOrders = "110";
+                  rows: List.generate(agents!.data.length, (index) {
+                    final empID = agents!.data[index].deliveryAgentId;
+                    final image = Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: CachedNetworkImageProvider(URLS.parseImage(agents!.data[index].image ?? "",
+                            ),
+                            ),
+
+                          ),
+
+                        ));
+                    final name = agents!.data[index].name??  "";
+                    final emailID = agents!.data[index].email??"";
+                    final mobileNumber =agents!.data[index].phoneNumber??"";
+                    final TotalOrders = agents!.data[index].totalOrders;
                     final WorkingStatus = "Active";
                     final view = Icon(Icons.remove_red_eye_outlined);
                     final actions = Row(
@@ -230,6 +337,7 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                       children: [
                         InkWell(
                           onTap:(){
+                            _openAddAgents(agents: agents!.data[index]);
                             // NavigationService().navigatePage(UpdateDeliveryAgent());
                           },
                           child: Container(
@@ -245,16 +353,21 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                           ),
                         ),
                         SizedBox(width: 20,),
-                        Container(
-                          alignment: Alignment.center,
-                          height: 30,
-                          width: 30,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: AppColors.grey)
+                        InkWell(
+                          onTap: (){
+                            deleteAgent(agents!.data[index].deliveryAgentId, index);
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 30,
+                            width: 30,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: AppColors.grey)
 
+                            ),
+                            child: Icon(Icons.delete_forever,size: 18,),
                           ),
-                          child: Icon(Icons.delete_forever,size: 18,),
                         )
                       ],
                     );
@@ -262,11 +375,11 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
 
                     return DataRow(
                       onSelectChanged: (bool){
-                        NavigationService().navigatePage(DeliveryAgentDetails());
+                        NavigationService().navigatePage(DeliveryAgentDetails(agentId: agents!.data[index].deliveryAgentId,));
                       },
                         cells: [
                           DataCell(
-                            Text(empID),
+                            Text("${empID}"),
                           ),
                           DataCell(
                             Padding(
@@ -278,20 +391,17 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                                       shape: BoxShape.rectangle,
                                       borderRadius: BorderRadius.circular(4),
                                       color: AppColors.appColor),
-                                  // child: ImageWidget(
-                                  //     imageUrl: URLS.buildImageUrl(
-                                  //         "${image}"))
-                                child: Text(image),
+                                  child: image
+
                               ),
                             ),
                           ),
                           DataCell(
                             Text(name),
                           ),
-                          DataCell(
-                              Container( child: Text(emailID))),
-                          DataCell(Container( child: Text(mobileNumber))),
-                          DataCell(Container( child: Text(TotalOrders))),
+                          DataCell(Container( child: Text(emailID))),
+                          DataCell(Container( child: Text("${mobileNumber}"))),
+                          DataCell(Container( child: Text("${TotalOrders}"))),
                           DataCell(Container( child: Text(WorkingStatus))),
                           DataCell(view),
                           DataCell(actions),

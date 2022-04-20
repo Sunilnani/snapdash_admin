@@ -27,7 +27,7 @@ class _ViewVehicleDetailsState extends State<ViewVehicleDetails> {
       _fetching = true;
     });
     try {
-      final response = await vehicleManager.fetchOrderDetail(widget.vehicleId);
+      final response = await vehicleManager.fetchVehicleDetail(widget.vehicleId);
 
       if (response.status == ResponseStatus.SUCCESS) {
         Fluttertoast.showToast(msg: response.message);
@@ -367,8 +367,6 @@ class _ViewVehicleDetailsState extends State<ViewVehicleDetails> {
                           ),
                         ],
                       )
-
-
 
 
                     ],

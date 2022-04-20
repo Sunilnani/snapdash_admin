@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:snapdash_admin/models/agentsModels/agent_details_model.dart';
+import 'package:snapdash_admin/models/agentsModels/agent_list_model.dart';
 import 'package:snapdash_admin/models/vehicles/vehicle_details_model.dart';
 import 'package:snapdash_admin/models/vehicles/vehicles_model.dart';
 import 'package:snapdash_admin/network_calls/base_network.dart';
@@ -9,33 +11,33 @@ import 'package:snapdash_admin/utils/urls.dart';
 
 
 
-class VehiclesManager {
-  factory VehiclesManager() {
+class AgentsManager {
+  factory AgentsManager() {
     return _singleton;
   }
 
-  VehiclesManager._internal();
+  AgentsManager._internal();
 
-  static final VehiclesManager _singleton = VehiclesManager._internal();
-
-  
-
-  
-
- 
+  static final AgentsManager _singleton = AgentsManager._internal();
 
 
-  Future<ResponseData> vehicles() async {
+
+
+
+
+
+
+  Future<ResponseData> agentsList() async {
     Response response;
     try {
-      response = await dioClient.ref!.get<dynamic>(URLS.vehiclesList);
-     // print("------response from  vehicles manager ${response.data}");
+      response = await dioClient.ref!.get<dynamic>(URLS.agentsList);
+      print("------response agent List manager ${response.data}");
 
       if (response.statusCode == 200) {
 
-        final ordersList = vechiclesListFromJson(jsonEncode(response.data));
+        final agentsList = agentsListModelFromJson(jsonEncode(response.data));
         return ResponseData("success", ResponseStatus.SUCCESS,
-            data: ordersList);
+            data: agentsList);
       } else {
         var message = "Unknown error";
         if (response.data?.containsKey("message") == true) {
@@ -50,19 +52,19 @@ class VehiclesManager {
   }
 
 
-  Future<ResponseData> fetchVehicleDetail(int vehicleId) async {
+  Future<ResponseData> fetchAgentDetail(int? agentId) async {
     Response response;
-    print(" s---------${vehicleId}");
-    print(URLS.vehicleDetails(vehicleId.toString()));
+    print("hgdvghc hgsvhc s---------${agentId}");
+    print(URLS.vehicleDetails(agentId.toString()));
     try {
 
       response =
-      await dioClient.ref!.get<dynamic>(URLS.vehicleDetails(vehicleId.toString()));
+      await dioClient.ref!.get<dynamic>(URLS.agentDetails(agentId.toString()));
 
       if (response.statusCode == 200) {
 
         print("Check 1 --> ${response.data}");
-        final model = vehicleDetailsFromJson(json.encode(response.data));
+        final model = agentDetailsModelFromJson(json.encode(response.data));
         return ResponseData("", ResponseStatus.SUCCESS, data: model);
       } else {
         var message = "Unknown error";
@@ -79,13 +81,13 @@ class VehiclesManager {
   }
 
 
-  Future<ResponseData> addVehicle(Map<String, dynamic> data) async {
+  Future<ResponseData> addAgent(Map<String, dynamic> data) async {
     final formData = FormData.fromMap(data);
     Response response;
     try {
       response = await dioClient.ref!
-          .post<dynamic>(URLS.addVehicle, data: formData);
-      print("------------->added vehicles are${response.statusMessage}");
+          .post<dynamic>(URLS.addAgent, data: formData);
+      //print("------------->added agents are${response.statusMessage}");
 
       if (response.statusCode == 200) {
         return ResponseData(
@@ -105,13 +107,16 @@ class VehiclesManager {
     }
   }
 
-  Future<ResponseData> updateVehicle(Map<String, dynamic> data) async {
+
+
+
+  Future<ResponseData> updateAgent(Map<String, dynamic> data) async {
     final formData = FormData.fromMap(data);
     Response response;
     try {
       response = await dioClient.ref!
-          .patch<dynamic>(URLS.updateVehicle, data: formData);
-      print("------------->added vehicles are${response.statusMessage}");
+          .patch<dynamic>(URLS.updateAgent, data: formData);
+      print("------------->updated agents are${response.statusMessage}");
 
       if (response.statusCode == 200) {
         return ResponseData(
@@ -131,12 +136,12 @@ class VehiclesManager {
     }
   }
 
-  Future<ResponseData> deleteVehicle(Map<String, dynamic> data) async {
+  Future<ResponseData> deleteAgent(Map<String, dynamic> data) async {
     final formData = FormData.fromMap(data);
     Response response;
     try {
       response = await dioClient.ref!
-          .delete<dynamic>(URLS.deleteVehicle, data: formData);
+          .delete<dynamic>(URLS.deleteAgent, data: formData);
       print("------------->added vehicles are${response.statusMessage}");
 
       if (response.statusCode == 200) {
@@ -171,4 +176,4 @@ class VehiclesManager {
 
 }
 
-VehiclesManager vehicleManager = VehiclesManager();
+AgentsManager agentManager = AgentsManager();

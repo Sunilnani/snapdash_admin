@@ -1,18 +1,65 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/base_home_page.dart';
+import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/user_managers.dart';
+import 'package:snapdash_admin/models/users_models/user_details_model.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/pages/orders_screens/widgets/drop_down_widget.dart';
 import 'package:snapdash_admin/pages/users_screens/cancelled_orders.dart';
 import 'package:snapdash_admin/pages/users_screens/placed_orders.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:snapdash_admin/utils/urls.dart';
 class ViewUser extends StatefulWidget {
-  const ViewUser({Key? key}) : super(key: key);
+  ViewUser({required this.userId});
+  final int? userId;
 
   @override
   State<ViewUser> createState() => _ViewUserState();
 }
 
 class _ViewUserState extends State<ViewUser> {
+
+
+
+  UsersDetailsModel? userDetails;
+
+  bool _fetching=false;
+
+  Future<void> _fetchUserDetails() async {
+    setState(() {
+      _fetching = true;
+    });
+    print("..........responsed");
+    print("-------->order id is ${widget.userId}");
+    final response = await userManager
+        .fetchUserDetail(widget.userId);
+    //print((response.data as OngoingOrderDetails).toJson());
+    print(response.data);
+    setState(() {
+      _fetching = false;
+    });
+
+    if (response.status == ResponseStatus.SUCCESS) {
+      Fluttertoast.showToast(msg: response.message);
+      setState(() {
+        userDetails = response.data;
+      });
+
+      // print(orderDetails?.OrderDetails?.productImages);
+    } else {
+      Fluttertoast.showToast(msg: response.message);
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    _fetchUserDetails();
+  }
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
@@ -32,28 +79,33 @@ class _ViewUserState extends State<ViewUser> {
                         children: [
                           Icon(Icons.water_damage_rounded,size: 18,),
                           SizedBox(width: 10,),
-                          Text(
-                            "Users",
-                            style: TextStyle(
-                                color:Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400),
+                          InkWell(
+                            onTap: (){
+                              NavigationService().pop();
+                            },
+                            child: Text(
+                              "Users",
+                              style: TextStyle(
+                                  color:Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400),
+                            ),
                           ),
                           VerticalDivider(
                             color: AppColors.black,
                             thickness: 1.25,
                           ),
-                          Text(
-                            "Users",
-                            style: TextStyle(
-                                color: AppColors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400),
-                          ),
-                          VerticalDivider(
-                            color: AppColors.black,
-                            thickness: 1.25,
-                          ),
+                          // Text(
+                          //   "Users",
+                          //   style: TextStyle(
+                          //       color: AppColors.black,
+                          //       fontSize: 14,
+                          //       fontWeight: FontWeight.w400),
+                          // ),
+                          // VerticalDivider(
+                          //   color: AppColors.black,
+                          //   thickness: 1.25,
+                          // ),
                           Text(
                             "View User",
                             style: TextStyle(
@@ -75,7 +127,7 @@ class _ViewUserState extends State<ViewUser> {
               top: 180,
               left: 150,
               right: 150,
-              child: Container(
+              child: userDetails == null ? CustomCircularProgressIndicator():Container(
                   height: MediaQuery.of(context).size.height*0.7,
                   padding: EdgeInsets.only(bottom: 30),
 
@@ -116,18 +168,34 @@ class _ViewUserState extends State<ViewUser> {
                             children: [
                               Row(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 55,
-                                    backgroundColor: Colors.yellow,
-                                  ),
+                                  Container(
+                                      height: 100,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          image: CachedNetworkImageProvider(URLS.parseImage(userDetails!.image ?? "",
+                                          ),
+                                          ),
+
+                                        ),
+
+                                      )),
+                                  // CircleAvatar(
+                                  //   radius: 55,
+                                  //   backgroundColor: Colors.yellow,
+                                  //   child: CachedNetworkImageProvider(URLS.parseImage(vehicles!.data[index].vehicleImage ?? "",
+                                  // ),
                                   SizedBox(width: 100,),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text("Sunny",style: TextStyle(fontSize: 24,fontWeight: FontWeight.w500),),
+                                      Text(userDetails!.userName??"no name",style: TextStyle(fontSize: 24,fontWeight: FontWeight.w500),),
                                       SizedBox(height: 10,),
-                                      Text("ID: 123445",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500,color: AppColors.red),),
+                                      Text("ID: ${userDetails!.userId}",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500,color: AppColors.red),),
                                     ],
                                   )
                                 ],
@@ -154,7 +222,7 @@ class _ViewUserState extends State<ViewUser> {
                                       child: CircleAvatar(
                                         radius: 20.0,
                                         backgroundColor: Colors.white,
-                                        child: Text("25",style: TextStyle(color: AppColors.red,fontSize: 14,fontWeight: FontWeight.w500),),
+                                        child: Text("${userDetails!.ordersCancelled}",style: TextStyle(color: AppColors.red,fontSize: 14,fontWeight: FontWeight.w500),),
                                       ),
                                     ),
                                     SizedBox(width: 10,),
@@ -186,7 +254,7 @@ class _ViewUserState extends State<ViewUser> {
                                       child: CircleAvatar(
                                         radius: 20.0,
                                         backgroundColor: AppColors.red,
-                                        child: Text("25",style: TextStyle(color: AppColors.whitecolor,fontSize: 14,fontWeight: FontWeight.w500),),
+                                        child: Text("${userDetails!.ordersPlaced}",style: TextStyle(color: AppColors.whitecolor,fontSize: 14,fontWeight: FontWeight.w500),),
                                       ),
                                     ),
                                     SizedBox(width: 10,),

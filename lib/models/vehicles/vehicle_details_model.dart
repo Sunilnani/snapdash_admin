@@ -28,7 +28,7 @@ class VehicleDetails {
     required this.updated,
   });
 
-  int vehicleId;
+  int? vehicleId;
   String vehicleName;
   String modelType;
   String modelNumber;
@@ -40,7 +40,7 @@ class VehicleDetails {
   DateTime registrationUpto;
   DateTime pollutionValidUpto;
   String image;
-  int vehicleStatus;
+  int? vehicleStatus;
   bool isDelete;
   dynamic created;
   DateTime updated;

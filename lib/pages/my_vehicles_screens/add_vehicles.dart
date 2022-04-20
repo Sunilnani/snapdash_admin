@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,11 +6,16 @@ import 'package:intl/intl.dart';
 import 'package:snapdash_admin/base_home_page.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/managers/vehicles_manager.dart';
+import 'package:snapdash_admin/models/vehicles/vehicles_model.dart';
 import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 import 'package:snapdash_admin/utils/custom_date.dart';
+
+
+
 class AddVehicle extends StatefulWidget {
-  const AddVehicle({Key? key}) : super(key: key);
+  AddVehicle({this.vehicle});
+  final MyVehiclesList? vehicle;
 
   @override
   State<AddVehicle> createState() => _AddVehicleState();
@@ -20,15 +23,12 @@ class AddVehicle extends StatefulWidget {
 
 class _AddVehicleState extends State<AddVehicle> {
 
-  File? insidePic;
-  final picker = ImagePicker();
-  void TakePhoto() async {
-    print("Image Picker");
-    final pickerFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    setState(() {
-      insidePic = File(pickerFile!.path);
-    });
-  }
+
+
+
+
+
+
   bool _loading = false;
   DateTime? _date;
   String? _formatteDate;
@@ -47,6 +47,100 @@ class _AddVehicleState extends State<AddVehicle> {
   final insuranceNumberController = TextEditingController();
   final dobController = TextEditingController();
   final pollutionValidController = TextEditingController();
+  final vehicleStatusController=TextEditingController();
+
+
+  Future<void> updateVehicle() async {
+
+     String? name = nameController.text.trim();
+     String? modelType=modelTypeController.text.trim();
+     String? modelNumber=modelNumberController.text.trim();
+     String? licenceNumber=licenceNumberController.text.trim();
+     String? engineNumber=engineNumberController.text.trim();
+     String? chasisNumber=chasisNumberController.text.trim();
+     String? insuranceNumber=insuranceNumberController.text.trim();
+     String? vehicleStatus=vehicleStatusController.text.trim();
+
+    final data = {
+
+      "vehicle_id":widget.vehicle!.vehicleId,
+      "name":name ?? "",
+      "model_type":modelType ?? "",
+      "model_number":modelNumber ?? "",
+      "licence_number":licenceNumber?? "",
+      "engine_number":engineNumber?? "",
+      "chassis_number":chasisNumber?? "",
+      "insurance_number":insuranceNumber?? "",
+      "registration_date":_date != null? CustomDate().formatServerDate(_date!): "",
+      "registration_upto":registrationUptoDate != null?CustomDate().formatServerDate(registrationUptoDate!):"",
+      // "pollution_valid_upto":CustomDate().formatServerDate(registrationUptoDate!),
+
+      "pollution_valid_upto":pollutionValidDate != null?CustomDate().formatServerDate(pollutionValidDate!):"",
+
+      // "image": MultipartFile.fromBytes(
+      //   await insidePic!.readAsBytes(),
+      //   filename: insidePic?.name,
+      // ),
+      "vehicle_status":vehicleStatus?? "",
+      // "image": MultipartFile.fromBytes(insidePic!.readAsBytesSync())
+
+    };
+
+
+    if(insidePic != null){
+     data["image"] = await  MultipartFile.fromBytes(
+       await insidePic!.readAsBytes(),
+       filename: insidePic?.name,
+     );
+    }
+
+    setState(() {
+      _loading = true;
+    });
+
+    final response = await vehicleManager.updateVehicle(data);
+
+    if (response.status == ResponseStatus.SUCCESS) {
+      Fluttertoast.showToast(msg: response.message);
+      Navigator.of(context).pop();
+    } else {
+      Fluttertoast.showToast(msg: response.message);
+      print("---------------------##########${response.status}");
+
+    }
+
+    setState(() {
+      _loading = false;
+    });
+  }
+
+   bool isEdit = false;
+
+  void _checkSelectionIfEdit(){
+    if(widget.vehicle != null){
+      nameController.text = widget.vehicle!.vehicleName;
+      modelTypeController.text=widget.vehicle!.modelType;
+      modelNumberController.text= widget.vehicle!.modelNumber;
+      licenceNumberController.text = widget.vehicle!.licenceNumber;
+      engineNumberController.text = widget.vehicle!.engineNumber;
+      chasisNumberController.text = widget.vehicle!.chassisNumber;
+      insuranceNumberController.text= widget.vehicle!.insuranceNumber;
+      vehicleStatusController.text = "${widget.vehicle!.vehicleStatus}";
+
+    }
+  }
+
+
+  void _checkIfEdit(){
+    if(widget.vehicle != null){
+      setState(() {
+        _checkSelectionIfEdit();
+        isEdit = true;
+      });
+    }
+  }
+
+
 
   Future<void> addNewVehicle() async {
 
@@ -57,7 +151,7 @@ class _AddVehicleState extends State<AddVehicle> {
     final engineNumber=engineNumberController.text.trim();
     final chasisNumber=chasisNumberController.text.trim();
     final insuranceNumber=insuranceNumberController.text.trim();
-    final pollutionValid=pollutionValidController.text.trim();
+    final vehicleStatus=vehicleStatusController.text.trim();
 
 
      if(name.isEmpty){
@@ -66,6 +160,10 @@ class _AddVehicleState extends State<AddVehicle> {
      }
     if(modelType.isEmpty){
       Fluttertoast.showToast(msg: "please enter modeltype");
+      return;
+    }
+    if(modelNumber.isEmpty){
+      Fluttertoast.showToast(msg: "please enter model number");
       return;
     }
     if(licenceNumber.isEmpty){
@@ -80,15 +178,18 @@ class _AddVehicleState extends State<AddVehicle> {
       Fluttertoast.showToast(msg: "please chasis number");
       return;
     }
-    if(name.isEmpty){
-      Fluttertoast.showToast(msg: "please enter name");
+    if(insuranceNumber.isEmpty){
+      Fluttertoast.showToast(msg: "please enter insurance number");
       return;
     }
     if(insidePic!.path.isEmpty){
-      Fluttertoast.showToast(msg: "please enter name");
+      Fluttertoast.showToast(msg: "please select image");
       return;
     }
-
+    if(_date==null){
+      Fluttertoast.showToast(msg: "please enter date");
+      return;
+    }
     final data = {
       "name":name,
       "model_type":modelType,
@@ -98,14 +199,17 @@ class _AddVehicleState extends State<AddVehicle> {
       "chassis_number":chasisNumber,
       "insurance_number":insuranceNumber,
       "registration_date":CustomDate().formatServerDate(_date!),
-      "pollution_valid_upto":CustomDate().formatServerDate(registrationUptoDate!),
+      "registration_upto":CustomDate().formatServerDate(registrationUptoDate!),
+      // "pollution_valid_upto":CustomDate().formatServerDate(registrationUptoDate!),
 
       "pollution_valid_upto":CustomDate().formatServerDate(pollutionValidDate!),
 
-      // "image": await MultipartFile.fromFile(
-      //   insidePic!.path,
-      // ),
-     "image": MultipartFile.fromBytes(insidePic!.readAsBytesSync())
+      "image": MultipartFile.fromBytes(
+        await insidePic!.readAsBytes(),
+        filename: insidePic?.name,
+      ),
+      "vehicle_status":vehicleStatus
+    // "image": MultipartFile.fromBytes(insidePic!.readAsBytesSync())
 
     };
 
@@ -126,6 +230,9 @@ class _AddVehicleState extends State<AddVehicle> {
     } else {
       Fluttertoast.showToast(msg: response.message);
       // ToastUtils().showToast(response.message);
+      print("---------------------00000000000000000${response.status}");
+      print("---------------------****${response.message}");
+      print("---------------------@@@${response.data}");
     }
 
     setState(() {
@@ -134,24 +241,25 @@ class _AddVehicleState extends State<AddVehicle> {
   }
 
 
-  // File? _image;
-  // // final picker = ImagePicker();
-  // Future getImage() async {
-  //   final pickedFile = await picker.getImage(source: ImageSource.gallery);
-  //   //File image = await ImagePicker.pickImage(source: ImageSource.gallery);
-  //   setState(() {
-  //     if (pickedFile != null) {
-  //       _image = File(pickedFile.path);
-  //     } else {
-  //       print('No image selected');
-  //     }
-  //   });
-  // }
+  XFile? insidePic;
+   final picker = ImagePicker();
+  Future getImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    //File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        insidePic = pickedFile;
+      } else {
+        print('No image selected');
+      }
+    });
+  }
 
 @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _checkIfEdit();
 
   }
 
@@ -190,7 +298,7 @@ class _AddVehicleState extends State<AddVehicle> {
                           ),
                           InkWell(
                             onTap: (){
-                              TakePhoto();
+                              //TakePhoto();
                             },
                             child: Text(
                               "Add Vehicle",
@@ -268,7 +376,7 @@ class _AddVehicleState extends State<AddVehicle> {
                                           InkWell(
                                               onTap: (){
                                                 setState(() {
-                                                  TakePhoto();
+                                                  getImage();
                                                 });
                                                 //TakePhoto(ImageSource.gallery,insidePic!);
                                                 Fluttertoast.showToast(msg: "Hello");
@@ -292,6 +400,7 @@ class _AddVehicleState extends State<AddVehicle> {
                               width: 50,
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(5),
+                                  child: Image.network(insidePic!.path),
                                   // child: Image.file(
                                   //   insidePic!,
                                   //  // _image!,
@@ -600,7 +709,7 @@ class _AddVehicleState extends State<AddVehicle> {
                                           Flexible(
                                             child: Text(
                                               _date == null
-                                                  ? "Date of Birth "
+                                                  ? "Registration Date "
                                                   : _formatteDate!,
                                               style: _date == null
                                                   ? TextStyle(
@@ -696,7 +805,7 @@ class _AddVehicleState extends State<AddVehicle> {
                                           Flexible(
                                             child: Text(
                                               registrationUptoDate == null
-                                                  ? "Date of Birth "
+                                                  ? "Registration Upto "
                                                   : registrationFormatUptoDate!,
                                               style: registrationUptoDate == null
                                                   ? TextStyle(
@@ -801,7 +910,7 @@ class _AddVehicleState extends State<AddVehicle> {
                                           Flexible(
                                             child: Text(
                                               pollutionValidDate == null
-                                                  ? "Date of Birth "
+                                                  ? "Pollution Valid "
                                                   : pollutionValidFormat!,
                                               style: pollutionValidDate == null
                                                   ? TextStyle(
@@ -819,6 +928,48 @@ class _AddVehicleState extends State<AddVehicle> {
                                           )
                                         ],
                                       ),
+                                    ),
+                                  ],
+                                ),
+
+                                SizedBox(height: 30,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Vehicle Status",style: TextStyle(color: AppColors.black,fontSize: 14,fontWeight: FontWeight.w500),),
+                                    SizedBox(width: 100,),
+
+                                    Container(
+                                      padding: EdgeInsets.only(left: 14, right: 14),
+                                      height: 50,
+                                      width: MediaQuery.of(context).size.width*0.25,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.rectangle,
+                                          borderRadius: BorderRadius.circular(4),
+                                          color: AppColors.whitecolor,
+                                          border: Border.all(color: AppColors.grey)
+                                      ),
+                                      child:TextField(
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        controller: vehicleStatusController,
+                                        cursorColor: AppColors.appColor,
+                                        // keyboardType: TextInputType.phone,
+                                        //  inputFormatters: <TextInputFormatter>[
+                                        //    FilteringTextInputFormatter.digitsOnly,
+                                        //    LengthLimitingTextInputFormatter(20)
+                                        //  ],
+                                        decoration: InputDecoration(
+                                          //hintText: "Search here",
+                                            hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey[500]),
+                                            border: InputBorder.none),
+                                      ),
+
                                     ),
                                   ],
                                 ),
@@ -843,7 +994,13 @@ class _AddVehicleState extends State<AddVehicle> {
                             SizedBox(width: 100,),
                             InkWell(
                               onTap: (){
-                                addNewVehicle();
+                                if(isEdit){
+                                  updateVehicle();
+                                }else {
+                                  addNewVehicle();
+                                }
+                                //updateVehicle();
+                               // addNewVehicle();
                               },
                               child: Container(
                                 alignment: Alignment.center,

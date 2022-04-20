@@ -16,13 +16,13 @@ class VechiclesList {
     required this.count,
   });
 
-  List<Datum> data;
+  List<MyVehiclesList> data;
   int page;
   int limit;
   int count;
 
   factory VechiclesList.fromJson(Map<String, dynamic> json) => VechiclesList(
-    data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+    data: List<MyVehiclesList>.from(json["data"].map((x) => MyVehiclesList.fromJson(x))),
     page: json["page"],
     limit: json["limit"],
     count: json["count"],
@@ -36,8 +36,8 @@ class VechiclesList {
   };
 }
 
-class Datum {
-  Datum({
+class MyVehiclesList {
+  MyVehiclesList({
     required this.vehicleId,
     required this.vehicleName,
     required this.modelType,
@@ -68,12 +68,12 @@ class Datum {
   DateTime registrationUpto;
   DateTime pollutionValidUpto;
   String vehicleImage;
-  int vehicleStatus;
-  bool isDelete;
+  int? vehicleStatus;
+  bool? isDelete;
   dynamic created;
   DateTime updated;
 
-  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+  factory MyVehiclesList.fromJson(Map<String, dynamic> json) => MyVehiclesList(
     vehicleId: json["vehicle_id"],
     vehicleName: json["vehicle_name"],
     modelType: json["model_type"],

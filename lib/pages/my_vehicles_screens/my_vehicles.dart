@@ -53,6 +53,54 @@ class _MyVehiclesState extends State<MyVehicles> {
     }
   }
 
+  bool _loading = false;
+
+  Future<void> deleteVehicle(dynamic vehicleId ,int index) async {
+
+
+
+    final data = {
+
+      "vehicle_id":vehicleId,
+
+    };
+
+    setState(() {
+      _loading = true;
+    });
+
+    final response = await vehicleManager.deleteVehicle(data);
+
+    if (response.status == ResponseStatus.SUCCESS) {
+      Fluttertoast.showToast(msg: response.message);
+      setState(() {
+
+        vehicles!.data.removeAt(index);
+      });
+      _fetchVehicles();
+
+     // Navigator.of(context).pop();
+    } else {
+      Fluttertoast.showToast(msg: response.message);
+      print("---------------------##########${response.status}");
+
+    }
+
+    setState(() {
+      _loading = false;
+    });
+  }
+
+
+
+  Future<void> _openAddVehicle({MyVehiclesList? vehicle})async{
+    await NavigationService().navigatePage(AddVehicle(vehicle:vehicle));
+    await _fetchVehicles();
+
+  }
+
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -158,9 +206,11 @@ class _MyVehiclesState extends State<MyVehicles> {
                           width: 100,
                         ),
                         GestureDetector(
-                          onTap: (){
+                          onTap: ()async{
                             // _openAddProduct();
-                           NavigationService().navigatePage(AddVehicle());
+                          await NavigationService().navigatePage(AddVehicle());
+                          _fetchVehicles();
+
                           },
                           child: Container(
                               height: 50,
@@ -237,223 +287,150 @@ class _MyVehiclesState extends State<MyVehicles> {
                             color: Colors.black.withOpacity(0.3))
                       ]),
 
-                  child: DataTable(
-                    // columnSpacing: 38.0,
-                    showCheckboxColumn: false,
-                    dataRowHeight: 70,
-                    headingRowColor: MaterialStateColor.resolveWith((states) {return AppColors.lightblue;},),
-                    columns: [
-                      DataColumn(label:Text('S.NO',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                      DataColumn(label: Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                      DataColumn(label: Text('Brand Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                      DataColumn(label: Text('Model Type',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                      DataColumn(label: Text('Model Number',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                      DataColumn(label: Text('Licence Palte',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                      DataColumn(label: Text('Vehicle status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                      DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                      DataColumn(label: Text('Actions',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    ],
-                    rows: List.generate(vehicles!.count.bitLength, (index) {
-                      final sNO ="1";
-                      final images=Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              fit: BoxFit.fill,
-                              image: CachedNetworkImageProvider(URLS.parseImage(vehicles!.data[index].vehicleImage ?? "",
-                              ),
-                            ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
 
-                          ),
-
-                      ));
-                      final image =CircleAvatar(
-                        radius: 25,
-                        backgroundImage: CachedNetworkImageProvider(URLS.parseImage(vehicles!.data[index].vehicleImage ?? "")),
-                      );
-                      final brandName = vehicles!.data[index].vehicleName;
-                      final modelType = vehicles!.data[index].modelType;
-                      final modelNumber = vehicles!.data[index].modelNumber;
-                      final licencePlate = vehicles!.data[index].licenceNumber;
-                      final vehicleStatus = vehicles!.data[index].vehicleStatus;
-                      final view = Icon(Icons.remove_red_eye_outlined);
-                      final actions = Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                InkWell(
-                                                  onTap:(){
-                                                   // NavigationService().navigatePage(UpdateDeliveryAgent());
-                                                  },
-                                                  child: Container(
-                                                    alignment: Alignment.center,
-                                                    height: 30,
-                                                    width: 30,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius: BorderRadius.circular(4),
-                                                        // border: Border.all(color: AppColors.red)
-                                                        color: AppColors.red
-                                                    ),
-                                                    child:Icon(Icons.person_add_alt,color:AppColors.whitecolor,size: 18,),
-                                                  ),
-                                                ),
-                                                SizedBox(width: 20,),
-                                                Container(
-                                                  alignment: Alignment.center,
-                                                  height: 30,
-                                                  width: 30,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(4),
-                                                      border: Border.all(color: AppColors.grey)
-
-                                                  ),
-                                                  child: Icon(Icons.delete_forever,size: 18,),
-                                                )
-                                              ],
-                                            );
-
-
-                      return DataRow(
-                          onSelectChanged: (bool){
-                            NavigationService().navigatePage(ViewVehicleDetails(vehicleId: vehicles!.data[index].vehicleId,));
-                          },
-                          cells: [
-                            DataCell(
-                                Text(
-                                  sNO
-                                )
-                            ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: AppColors.appColor),
-                                    child: images
-
+                    child: DataTable(
+                      // columnSpacing: 38.0,
+                      showCheckboxColumn: false,
+                      dataRowHeight: 70,
+                      headingRowColor: MaterialStateColor.resolveWith((states) {return AppColors.lightblue;},),
+                      columns: [
+                        DataColumn(label:Text('S.NO',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                        DataColumn(label: Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                        DataColumn(label: Text('Brand Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                        DataColumn(label: Text('Model Type',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                        DataColumn(label: Text('Model Number',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                        DataColumn(label: Text('Licence Palte',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                        DataColumn(label: Text('Vehicle status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                        DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                        DataColumn(label: Text('Actions',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      ],
+                      rows: List.generate(vehicles!.data.length, (index) {
+                        final sNO = index.toString();
+                        final images=Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                fit: BoxFit.fill,
+                                image: CachedNetworkImageProvider(URLS.parseImage(vehicles!.data[index].vehicleImage ?? "",
                                 ),
                               ),
+
                             ),
 
-                            DataCell(
-                                Container( child: Text(brandName))),
-                            DataCell(
-                                Container( child: Text(modelType))),
+                        ));
+                        final image =CircleAvatar(
+                          radius: 25,
+                          backgroundImage: CachedNetworkImageProvider(URLS.parseImage(vehicles!.data[index].vehicleImage ?? "")),
+                        );
+                        final brandName = vehicles!.data[index].vehicleName;
+                        final modelType = vehicles!.data[index].modelType;
+                        final modelNumber = vehicles!.data[index].modelNumber;
+                        final licencePlate = vehicles!.data[index].licenceNumber;
+                        final vehicleStatus = vehicles!.data[index].vehicleStatus;
+                        final view = Icon(Icons.remove_red_eye_outlined);
+                        final actions = Row(
+                                                // mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  InkWell(
+                                                    onTap:(){
+                                                     _openAddVehicle(vehicle: vehicles!.data[index]);
+                                                    },
+                                                    child: Container(
+                                                      alignment: Alignment.center,
+                                                      height: 30,
+                                                      width: 30,
+                                                      decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(4),
+                                                          // border: Border.all(color: AppColors.red)
+                                                          color: AppColors.red
+                                                      ),
+                                                      child:Icon(Icons.person_add_alt,color:AppColors.whitecolor,size: 18,),
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 20,),
+                                                  InkWell(
+                                                    onTap:(){
+                                                      deleteVehicle(vehicles!.data[index].vehicleId, index);
+                                                    },
+                                                    child: Container(
+                                                      alignment: Alignment.center,
+                                                      height: 30,
+                                                      width: 30,
+                                                      decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(4),
+                                                          border: Border.all(color: AppColors.grey)
 
-                            DataCell(Container( child: Text(modelNumber))),
-                            DataCell(Container( child: Text(licencePlate))),
-                            DataCell(Container( child: Text("${vehicleStatus}"))),
-                            DataCell(Container( child: view)),
-                            DataCell(Container( child: actions)),
+                                                      ),
+                                                      child: Icon(Icons.delete_forever,size: 18,),
+                                                    ),
+                                                  )
+                                                ],
+                                              );
 
-                          ]);
-                    }),
+
+                        return DataRow(
+                            onSelectChanged: (bool){
+                              // editvehicle:(){
+                              //   _openAddVehicle(vehicle: vehicles!.data[index]);
+                              // };
+                              NavigationService().navigatePage(ViewVehicleDetails(vehicleId: vehicles!.data[index].vehicleId,));
+                            },
+                            cells: [
+                              DataCell(
+                                  Text(
+                                    "${sNO}"
+                                  )
+                              ),
+
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.rectangle,
+                                          borderRadius: BorderRadius.circular(4),
+                                          color: AppColors.appColor),
+                                      child: images
+
+                                  ),
+                                ),
+                              ),
+
+                              DataCell(
+                                  Container( child: Text(brandName))),
+                              DataCell(
+                                  Container( child: Text(modelType))),
+
+                              DataCell(Container( child: Text(modelNumber))),
+                              DataCell(Container( child: Text(licencePlate))),
+                              DataCell(Container( child:vehicleStatus=="0"?
+
+
+                                  Image.asset(
+                                     "assets/icons/notify_off.png",
+                                     height: 50,
+                                      width: 50,
+                                     ):
+                                   Image.asset(
+                                  "assets/icons/Radio Button.png",
+                                  height: 50,
+                                    width: 50,
+                                  )
+                              )),
+                              DataCell(Container( child: view)),
+                              DataCell(Center(child: Container( child: actions))),
+
+                            ]);
+                      }),
+                    ),
                   ),
 
 
-
-                  // child: Column(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     Container(
-                  //       color: AppColors.lightblue,
-                  //       height: 60,
-                  //       //alignment: Alignment.center,
-                  //       child: Row(
-                  //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //         children: [
-                  //           Text('S.NO',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //           Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //           Text('Brand Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //           Text('Model Type',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //           Text('Model Number',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //           Text('Licence Palte',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //           Text('Vehicle status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //           Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //           Text('Actions',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //     SizedBox(height: 10,),
-                  //     ListView.builder(
-                  //         padding: EdgeInsets.only(
-                  //           top: 20,
-                  //         ),
-                  //         shrinkWrap: true,
-                  //         physics: NeverScrollableScrollPhysics(),
-                  //         scrollDirection: Axis.vertical,
-                  //         itemCount: 3,
-                  //
-                  //         itemBuilder: (context, index) {
-                  //           return Column(
-                  //             crossAxisAlignment: CrossAxisAlignment.end,
-                  //             children: [
-                  //               InkWell(
-                  //                 onTap:(){
-                  //                   //NavigationService().navigatePage(DeliveryAgentDetails());
-                  //                 },
-                  //                 child: Row(
-                  //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //                   children: [
-                  //                     Text("01"),
-                  //                     CircleAvatar(
-                  //                       backgroundColor: Colors.yellow,
-                  //                       radius: 20,
-                  //                     ),
-                  //                     Text("Hero Honda"),
-                  //                     Text("Passion Plus"),
-                  //                     Text("HR1234"),
-                  //                     Text("Ap394774"),
-                  //                     Text("status 0"),
-                  //                     Icon(Icons.remove_red_eye_outlined,size: 18,color: Colors.black,),
-                  //                     Row(
-                  //                       mainAxisAlignment: MainAxisAlignment.center,
-                  //                       children: [
-                  //                         InkWell(
-                  //                           onTap:(){
-                  //                            // NavigationService().navigatePage(UpdateDeliveryAgent());
-                  //                           },
-                  //                           child: Container(
-                  //                             alignment: Alignment.center,
-                  //                             height: 30,
-                  //                             width: 30,
-                  //                             decoration: BoxDecoration(
-                  //                                 borderRadius: BorderRadius.circular(4),
-                  //                                 // border: Border.all(color: AppColors.red)
-                  //                                 color: AppColors.red
-                  //                             ),
-                  //                             child:Icon(Icons.person_add_alt,color:AppColors.whitecolor,size: 18,),
-                  //                           ),
-                  //                         ),
-                  //                         SizedBox(width: 20,),
-                  //                         Container(
-                  //                           alignment: Alignment.center,
-                  //                           height: 30,
-                  //                           width: 30,
-                  //                           decoration: BoxDecoration(
-                  //                               borderRadius: BorderRadius.circular(4),
-                  //                               border: Border.all(color: AppColors.grey)
-                  //
-                  //                           ),
-                  //                           child: Icon(Icons.delete_forever,size: 18,),
-                  //                         )
-                  //                       ],
-                  //                     )
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //               SizedBox(height: 20,)
-                  //             ],
-                  //           );
-                  //         })
-                  //
-                  //
-                  //   ],
-                  // ),
                 ),
               ),
             ),

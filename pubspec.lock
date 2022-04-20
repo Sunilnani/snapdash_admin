@@ -113,13 +113,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.2"
-  file_picker:
-    dependency: "direct main"
-    description:
-      name: file_picker
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.5.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -192,7 +185,7 @@ packages:
     source: hosted
     version: "0.8.4+11"
   image_picker_for_web:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: image_picker_for_web
       url: "https://pub.dartlang.org"

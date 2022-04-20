@@ -206,7 +206,7 @@ class _OTPScreenState extends State<OTPScreen> {
                                     LengthLimitingTextInputFormatter(10)
                                   ],
                                   decoration: InputDecoration(
-                                      hintText: "Enter your number",
+                                      hintText: "Enter your otp",
                                       // suffixIcon: Padding(
                                       //   padding: const EdgeInsets.all(10.0),
                                       //   child: Image(

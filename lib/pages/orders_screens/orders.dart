@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/base_home_page.dart';
+import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/orders_manager.dart';
+import 'package:snapdash_admin/models/orders_model/orders_list_model.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/pages/orders_screens/order_details.dart';
 import 'package:snapdash_admin/pages/orders_screens/widgets/drop_down_widget.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
@@ -29,6 +34,53 @@ class _OrdersState extends State<Orders> {
 
   late DateTime _date;
   late String _formatteDate;
+
+  bool _fetching = false;
+
+  //PastOrders? pastOrders;
+
+  OrdersListModel? orders;
+
+  Future<void> _fetchOrders() async {
+    setState(() {
+      _fetching = true;
+    });
+    try {
+      final response = await ordersManager.ordersList();
+
+      if (response.status == ResponseStatus.SUCCESS) {
+        Fluttertoast.showToast(msg: response.message);
+        print("------->ordersList ${(response.data as OrdersListModel).toJson()}");
+        setState(() {
+          orders = response.data;
+        });
+        setState(() {
+          _fetching=false;
+        });
+      } else {
+        Fluttertoast.showToast(msg: response.message);
+      }
+    } catch (err) {
+      print(err);
+      // run now once
+      setState(() {
+        _fetching = false;
+      });
+    }
+  }
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchOrders();
+  }
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
@@ -202,7 +254,7 @@ class _OrdersState extends State<Orders> {
               left: 70,
               right: 70,
               bottom: 30,
-              child: Container(
+              child:orders == null ? CustomCircularProgressIndicator(): Container(
                 height: MediaQuery.of(context).size.height*0.7,
                 clipBehavior: Clip.antiAliasWithSaveLayer,
 
@@ -217,137 +269,64 @@ class _OrdersState extends State<Orders> {
                           color: Colors.black.withOpacity(0.4))
                     ]
                 ),
-                child: DataTable(
-                  // columnSpacing: 38.0,
-                  showCheckboxColumn: false,
-                  dataRowHeight: 70,
-                  headingRowColor: MaterialStateColor.resolveWith((states) {return AppColors.lightblue;},),
-                  columns: [
-                    DataColumn(label:Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('OrderID',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Category Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Order Styatus',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                    DataColumn(label: Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
-                  ],
-                  rows: List.generate(3, (index) {
-                    final date = "23-10-2022";
-                    final orderId = "#12344";
-                    final name = "hitler";
-                    final categoryName = "Bokks";
-                    final paymentMethod = "Cash";
-                    final orderSttatus = "Ready to PickUp";
-                    final grandTotal = "c 20";
-                    final view = Icon(Icons.remove_red_eye_outlined);
-                    final orderPicked = "peter st";
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: DataTable(
+                    // columnSpacing: 38.0,
+                    showCheckboxColumn: false,
+                    dataRowHeight: 70,
+                    headingRowColor: MaterialStateColor.resolveWith((states) {return AppColors.lightblue;},),
+                    columns: [
+                      DataColumn(label:Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      DataColumn(label: Text('OrderID',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      DataColumn(label: Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      DataColumn(label: Text('Category Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      DataColumn(label: Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      DataColumn(label: Text('Order Status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      DataColumn(label: Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                      DataColumn(label: Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+                    ],
+                    rows: List.generate(orders!.data.length, (index) {
+                      final date = "23-10-2022";
+                      final orderId = orders!.data[index].orderId;
+                      final name = orders!.data[index].userName;
+                      final categoryName = orders!.data[index].categoryName;;
+                      final paymentMethod = orders!.data[index].paymentMode;
+                      final orderSttatus = orders!.data[index].status;
+                      final grandTotal = orders!.data[index].price;
+                      final view = Icon(Icons.remove_red_eye_outlined);
+                      final orderPicked = orders!.data[index].receiverName??"";
 
 
-                    return DataRow(
-                        onSelectChanged: (bool){
-                          NavigationService().navigatePage(OrderDetails());
-                        },
-                        cells: [
-                          DataCell(
-                            Text(date),
-                          ),
-                          DataCell(
-                            Text(orderId),
-                          ),
-                          DataCell(
-                            Text(name),
-                          ),
-                          DataCell(
-                              Container( child: Text(categoryName))),
-                          DataCell(Container( child: Text(paymentMethod))),
-                          DataCell(Container( child: Text(orderSttatus,style: AppColors.subheadingred,))),
-                          DataCell(Container( child: Text(grandTotal))),
-                          DataCell(view),
-                          DataCell(Text(orderPicked)),
+                      return DataRow(
+                          onSelectChanged: (bool){
+                            NavigationService().navigatePage(OrderDetails(orderId: orders!.data[index].orderId,));
+                          },
+                          cells: [
+                            DataCell(
+                              Text(date),
+                            ),
+                            DataCell(
+                              Text("${orderId}"),
+                            ),
+                            DataCell(
+                              Text(name),
+                            ),
+                            DataCell(
+                                Container( child: Text(categoryName))),
+                            DataCell(Container( child: Text(paymentMethod))),
+                            DataCell(Container( child: Text("${orderSttatus}",style: AppColors.subheadingred,))),
+                            DataCell(Container( child: Text("c ${grandTotal}"))),
+                            DataCell(view),
+                            DataCell(Text("${orderPicked}")),
 
-                        ]);
-                  }),
+                          ]);
+                    }),
+                  ),
                 ),
 
 
-                // child: Container(
-                //   width: double.infinity,
-                //   decoration: BoxDecoration(
-                //       shape: BoxShape.rectangle,
-                //       color: AppColors.whitecolor,
-                //       borderRadius: BorderRadius.circular(5),
-                //       boxShadow: [
-                //         BoxShadow(
-                //             offset: Offset(0, 3),
-                //             blurRadius: 10,
-                //             spreadRadius: 0,
-                //             color: Colors.black.withOpacity(0.3))
-                //       ]),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Container(
-                //         color: AppColors.lightblue,
-                //         height: 60,
-                //         //alignment: Alignment.center,
-                //         child: Row(
-                //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //           children: [
-                //             Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //             Text('Order Id',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //             Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //             Text('Category name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //             Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //             Text('Order Status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //             Text('Grand total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //             Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //             Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           ],
-                //         ),
-                //       ),
-                //       SizedBox(height: 10,),
-                //       ListView.builder(
-                //           padding: EdgeInsets.only(
-                //             top: 20,
-                //           ),
-                //           shrinkWrap: true,
-                //          // separatorBuilder: (_, __) => Divider(height: 2,color: Colors.white,),
-                //           physics: NeverScrollableScrollPhysics(),
-                //           scrollDirection: Axis.vertical,
-                //           itemCount: 5,
-                //
-                //           itemBuilder: (context, index) {
-                //             return InkWell(
-                //               onTap:(){
-                //                 NavigationService().navigatePage(OrderDetails());
-                //               },
-                //               child: Padding(
-                //                 padding: const EdgeInsets.only(bottom: 40.0),
-                //                 child: Row(
-                //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //                   children: [
-                //                     Text("25--3-22"),
-                //                     Text("#123"),
-                //                     Text("Mike"),
-                //                     Text("Books"),
-                //                     Text("Cash"),
-                //                     Text("Ready to pick",style: TextStyle(color: AppColors.red),),
-                //                     Text("c 20"),
-                //                     Icon(Icons.remove_red_eye_outlined,size: 18,color: Colors.black,),
-                //                     Text("Mike Jacob"),
-                //
-                //                   ],
-                //                 ),
-                //               ),
-                //             );
-                //           })
-                //
-                //
-                //     ],
-                //   ),
-                // ),
               ),
             ),
 

@@ -8,7 +8,6 @@ import 'package:snapdash_admin/pages/delivery_agents_screens/add_delivery_agent/
 import 'package:snapdash_admin/pages/delivery_agents_screens/delivery_agents.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 class AddAgentBankDetails extends StatefulWidget {
-  const AddAgentBankDetails({Key? key}) : super(key: key);
 
   @override
   State<AddAgentBankDetails> createState() => _AddAgentBankDetailsState();
@@ -641,4 +640,5 @@ class _AddAgentBankDetailsState extends State<AddAgentBankDetails> {
         )
     );
   }
+
 }
