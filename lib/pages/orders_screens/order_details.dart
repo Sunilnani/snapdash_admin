@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/base_home_page.dart';
@@ -7,6 +8,8 @@ import 'package:snapdash_admin/managers/orders_manager.dart';
 import 'package:snapdash_admin/models/orders_model/order_details_model.dart';
 import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:snapdash_admin/utils/custom_date.dart';
+import 'package:snapdash_admin/utils/urls.dart';
 class OrderDetails extends StatefulWidget {
  OrderDetails({required this.orderId});
  final int? orderId;
@@ -56,6 +59,7 @@ class _OrderDetailsState extends State<OrderDetails> {
       Fluttertoast.showToast(msg: response.message);
     }
   }
+
 
   @override
   void initState() {
@@ -158,12 +162,11 @@ class _OrderDetailsState extends State<OrderDetails> {
               ),
             ),
 
-
             Positioned(
               top: 180,
               left: 70,
               right: 70,
-              child: orderDetails == null? CustomCircularProgressIndicator():Container(
+              child: orderDetails == null? Center(child: CustomCircularProgressIndicator()):Container(
                 height: MediaQuery.of(context).size.height*0.7,
                 padding: EdgeInsets.only(top: 40,bottom: 30),
 
@@ -206,7 +209,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                                 Text("${orderDetails!.orderId}",style: TextStyle(color: AppColors.black
                                     ,fontSize: 20,fontWeight: FontWeight.w600),),
                                 SizedBox(height: 15,),
-                                Text("Ordered on OCTOBER 25,2022",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                Text("Ordered on:  ${CustomDate().formatServerDate(orderDetails!.createdAt)}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
 
                                 SizedBox(height: 30,),
                                 Row(
@@ -274,16 +277,29 @@ class _OrderDetailsState extends State<OrderDetails> {
                             DataColumn(label: Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                             DataColumn(label: Text('OrderPicked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                           ],
-                          rows: List.generate(2, (index) {
-                            final date = "23-12-2022";
-                            final orderId="123";
-                            final image = "image";
-                            final orderType = "Electronics";
-                            final Nmae = "Sunil";
-                            final paymentMethod = "Cod";
-                            final orderStatus = "Delivered";
-                            final grandTotal = "c 20";
-                            final orderPicked="peter st";
+                          rows: List.generate(1, (index) {
+                            final date = CustomDate().formatServerDate(orderDetails!.createdAt);
+                            final orderId=orderDetails!.orderId;
+                            final image =
+                            Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.fill,
+                                    image: CachedNetworkImageProvider(URLS.parseImage(orderDetails!.image ?? "",
+                                    ),
+                                    ),
+
+                                  ),
+
+                                ));
+                            final orderType = orderDetails!.categoryName;
+                            final Nmae = orderDetails!.userName;
+                            final paymentMethod = orderDetails!.paymentMode;
+                            final orderStatus = orderDetails!.status;
+                            final grandTotal = "c ${orderDetails!.price}";
+                            final orderPicked=orderDetails!.receiverName;
 
 
                             return DataRow(
@@ -295,22 +311,20 @@ class _OrderDetailsState extends State<OrderDetails> {
                                     Text(date),
                                   ),
                                   DataCell(
-                                    Text(orderId),
+                                    Text("${orderId}"),
                                   ),
                                   DataCell(
                                     Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: Container(
-                                        height: 40,
-                                        width: 40,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.rectangle,
-                                            borderRadius: BorderRadius.circular(4),
-                                            color: AppColors.appColor),
-                                        // child: ImageWidget(
-                                        //     imageUrl: URLS.buildImageUrl(
-                                        //         "${image}"))
-                                        child: Text(image),
+                                          height: 40,
+                                          width: 40,
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              borderRadius: BorderRadius.circular(4),
+                                              color: AppColors.appColor),
+                                          child: image
+
                                       ),
                                     ),
                                   ),
@@ -318,11 +332,11 @@ class _OrderDetailsState extends State<OrderDetails> {
                                     Text(orderType),
                                   ),
                                   DataCell(
-                                      Container( child: Text(Nmae))),
+                                      Container( child: Text(Nmae??""))),
                                   DataCell(Container( child: Text(paymentMethod))),
-                                  DataCell(Container( child: Text(orderStatus))),
-                                  DataCell(Container( child: Text(grandTotal))),
-                                  DataCell(Text(orderPicked)),
+                                  DataCell(Container( child: Text("${orderStatus}"))),
+                                  DataCell(Container( child: Text(grandTotal??""))),
+                                  DataCell(Text(orderPicked??"")),
 
 
                                 ]);
@@ -335,10 +349,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                         ),
                         SizedBox(height: 10,),
                         Padding(
-                          padding: const EdgeInsets.only(right: 330.0,top: 30),
+                          padding: const EdgeInsets.only(right: 300.0,top: 30),
                           child: Align(
                             alignment: Alignment.bottomRight,
-                              child: Text("Total Amount     c40",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w500),)),
+                              child: Text("Total Amount     c${orderDetails!.price.round()}",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w500),)),
                         )
                     ],
                   ),
@@ -351,90 +365,93 @@ class _OrderDetailsState extends State<OrderDetails> {
     );
   }
   Widget pickUpDetails(){
-    return  Container(
-      height: MediaQuery.of(context).size.height*0.32,
-      width: MediaQuery.of(context).size.width*0.26,
-      padding: EdgeInsets.only(top: 20,left: 35,right: 35),
+    return  Padding(
+      padding: const EdgeInsets.only(top: 5.0),
+      child: Container(
+        height: MediaQuery.of(context).size.height*0.32,
+        width: MediaQuery.of(context).size.width*0.26,
+        padding: EdgeInsets.only(top: 20,left: 35,right: 35),
 
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-                offset: Offset(0, 3),
-                blurRadius: 5,
-                spreadRadius: 0,
-                color: Colors.black.withOpacity(0.4))
-          ]
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Pick-Up-Address",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w600),),
-          SizedBox(height: 50,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Customer Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text("${orderDetails!.userName}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-            ],
-          ),
-          SizedBox(height: 15,),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                  offset: Offset(0, 3),
+                  blurRadius: 5,
+                  spreadRadius: 0,
+                  color: Colors.black.withOpacity(0.4))
+            ]
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Pick-Up-Address",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w600),),
+            SizedBox(height: 50,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Customer Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text("${orderDetails!.userName}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Phone Number",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text("${orderDetails!.userNumber}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-            ],
-          ),
-          SizedBox(height: 15,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Phone Number",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text("${orderDetails!.userNumber}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
 
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     Text("Email ID",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-          //     Text("sunil123@gmail.com",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-          //   ],
-          // ),
-          // SizedBox(height: 15,),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     Text("Email ID",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+            //     Text("sunil123@gmail.com",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            //   ],
+            // ),
+            // SizedBox(height: 15,),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Area",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text(address[0],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-            ],
-          ),
-          SizedBox(height: 15,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Area",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text(address[0],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Flat / Building Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text(address[1],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-            ],
-          ),
-          SizedBox(height: 15,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Street Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text(address[2],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-            ],
-          ),
-          SizedBox(height: 15,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Flat / Building Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text(address[1],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Street Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text(address[2],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              ],
+            ),
+            SizedBox(height: 15,),
 
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     Text("Pincode",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-          //     Text("002030",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-          //   ],
-          // ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     Text("Pincode",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+            //     Text("002030",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+            //   ],
+            // ),
 
 
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -466,7 +483,7 @@ class _OrderDetailsState extends State<OrderDetails> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Customer Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                Text("Agent Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
                 Text(orderDetails!.receiverName??"No name",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
               ],
             ),

@@ -414,8 +414,8 @@ class _UsersState extends State<Users> {
                                   ),
                                 ));
                             ;
-                            final name = users!.userData[index].userName;
-                            final gender = users!.userData[index].gender;
+                            final name = users!.userData[index].userName??"No Name";
+                            final gender = users!.userData[index].gender??"Not Selected";
                             final emailID = "Sunil345@gmail.com";
                             final mobileNumber =
                                 users!.userData[index].phoneNumber;

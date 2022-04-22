@@ -79,7 +79,7 @@ class _MyVehiclesState extends State<MyVehicles> {
       });
       _fetchVehicles();
 
-     // Navigator.of(context).pop();
+      Navigator.of(context).pop();
     } else {
       Fluttertoast.showToast(msg: response.message);
       print("---------------------##########${response.status}");
@@ -99,7 +99,7 @@ class _MyVehiclesState extends State<MyVehicles> {
 
   }
 
-
+var vehicleId;
 
   @override
   void initState() {
@@ -353,7 +353,8 @@ class _MyVehiclesState extends State<MyVehicles> {
                                                   SizedBox(width: 20,),
                                                   InkWell(
                                                     onTap:(){
-                                                      deleteVehicle(vehicles!.data[index].vehicleId, index);
+                                                     _show(index);
+
                                                     },
                                                     child: Container(
                                                       alignment: Alignment.center,
@@ -408,20 +409,21 @@ class _MyVehiclesState extends State<MyVehicles> {
 
                               DataCell(Container( child: Text(modelNumber))),
                               DataCell(Container( child: Text(licencePlate))),
-                              DataCell(Container( child:vehicleStatus=="0"?
-
+                              DataCell(Container( child:"${vehicleStatus}"=="0"?
+                              Image.asset(
+                                "assets/icons/Radio Button.png",
+                                height: 50,
+                                width: 50,
+                              ):
 
                                   Image.asset(
                                      "assets/icons/notify_off.png",
                                      height: 50,
                                       width: 50,
-                                     ):
-                                   Image.asset(
-                                  "assets/icons/Radio Button.png",
-                                  height: 50,
-                                    width: 50,
-                                  )
-                              )),
+                                     )
+
+                              )
+                        ),
                               DataCell(Container( child: view)),
                               DataCell(Center(child: Container( child: actions))),
 
@@ -434,9 +436,58 @@ class _MyVehiclesState extends State<MyVehicles> {
                 ),
               ),
             ),
-
           ],
         )
     );
   }
+  Future<void> _show(int index)async{
+    return showDialog(
+        context: context,
+        builder: (_) =>  AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius:
+              BorderRadius.all(
+                  Radius.circular(10.0))),
+          content: Builder(
+            builder: (context) {
+
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Container(
+                  height: 80,
+                  width: 300,
+                  child: Text('Remove the selected vehicles from list',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600),),
+
+                ),
+              );
+            },
+          ),
+          actions: <Widget>[
+            Center(
+              child: Row(
+                children: [
+                  TextButton(
+                    child: const Text('Cancel'),
+                    onPressed: () {
+                      NavigationService().pop();
+                    },
+                  ),
+                  SizedBox(width: 50,),
+                  TextButton(
+                    child: const Text('Delete'),
+                    onPressed: () {
+                      deleteVehicle(vehicles!.data[index].vehicleId, index);
+                    },
+                  ),
+
+                ],
+              )
+            )
+          ],
+        )
+    );
+  }
+
+
+
 }

@@ -1,25 +1,53 @@
 // To parse this JSON data, do
 //
-//     final orderDetailsModel = orderDetailsModelFromJson(jsonString);
+//     final userPlacedOrdersModel = userPlacedOrdersModelFromJson(jsonString);
 
 import 'dart:convert';
 
-OrderDetailsModel orderDetailsModelFromJson(String str) => OrderDetailsModel.fromJson(json.decode(str));
+UserPlacedOrdersModel userPlacedOrdersModelFromJson(String str) => UserPlacedOrdersModel.fromJson(json.decode(str));
 
-String orderDetailsModelToJson(OrderDetailsModel data) => json.encode(data.toJson());
+String userPlacedOrdersModelToJson(UserPlacedOrdersModel data) => json.encode(data.toJson());
 
-class OrderDetailsModel {
-  OrderDetailsModel({
+class UserPlacedOrdersModel {
+  UserPlacedOrdersModel({
+    required this.data,
+    required this.page,
+    required this.limit,
+    required this.totalCount,
+  });
+
+  List<Datum> data;
+  int page;
+  int limit;
+  int totalCount;
+
+  factory UserPlacedOrdersModel.fromJson(Map<String, dynamic> json) => UserPlacedOrdersModel(
+    data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+    page: json["page"],
+    limit: json["limit"],
+    totalCount: json["total_count"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    "page": page,
+    "limit": limit,
+    "total_count": totalCount,
+  };
+}
+
+class Datum {
+  Datum({
     required this.orderId,
     required this.userId,
-    required this.userName,
-    required this.image,
+    this.userName,
     required this.userNumber,
     required this.categoryId,
     required this.categoryName,
     required this.paymentMode,
     required this.itemName,
     required this.itemWeight,
+    required this.itemImage,
     required this.pickupAddress,
     required this.pickupLongitude,
     required this.pickupLatitude,
@@ -27,7 +55,7 @@ class OrderDetailsModel {
     required this.deliveryLongitude,
     required this.deliveryLatitude,
     required this.receiverId,
-    required this.receiverName,
+    this.receiverName,
     required this.receiverNumber,
     required this.status,
     required this.distance,
@@ -39,14 +67,14 @@ class OrderDetailsModel {
 
   int orderId;
   int userId;
-  String userName;
-  String image;
+  dynamic userName;
   int userNumber;
   int categoryId;
   String categoryName;
   String paymentMode;
   String itemName;
   int itemWeight;
+  String itemImage;
   String pickupAddress;
   String pickupLongitude;
   String pickupLatitude;
@@ -63,17 +91,17 @@ class OrderDetailsModel {
   DateTime createdAt;
   DateTime updatedAt;
 
-  factory OrderDetailsModel.fromJson(Map<String, dynamic> json) => OrderDetailsModel(
+  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
     orderId: json["order_id"],
     userId: json["user_id"],
     userName: json["user_name"],
-    image: json["item_image"],
     userNumber: json["user_number"],
     categoryId: json["category_id"],
     categoryName: json["category_name"],
     paymentMode: json["payment_mode"],
     itemName: json["item_name"],
     itemWeight: json["item_weight"],
+    itemImage: json["item_image"],
     pickupAddress: json["pickup_address"],
     pickupLongitude: json["pickup_longitude"],
     pickupLatitude: json["pickup_latitude"],
@@ -95,13 +123,13 @@ class OrderDetailsModel {
     "order_id": orderId,
     "user_id": userId,
     "user_name": userName,
-    "item_image":image,
     "user_number": userNumber,
     "category_id": categoryId,
     "category_name": categoryName,
     "payment_mode": paymentMode,
     "item_name": itemName,
     "item_weight": itemWeight,
+    "item_image": itemImage,
     "pickup_address": pickupAddress,
     "pickup_longitude": pickupLongitude,
     "pickup_latitude": pickupLatitude,
@@ -122,14 +150,14 @@ class OrderDetailsModel {
 
 class DeliveryAgentDetails {
   DeliveryAgentDetails({
-    this.deliveryAgentId,
-    this.deliveryAgentName,
-    this.deliveryAgentNumber,
+    required this.deliveryAgentId,
+    required this.deliveryAgentName,
+    required this.deliveryAgentNumber,
   });
 
-  dynamic deliveryAgentId;
-  dynamic deliveryAgentName;
-  dynamic deliveryAgentNumber;
+  int deliveryAgentId;
+  String deliveryAgentName;
+  int deliveryAgentNumber;
 
   factory DeliveryAgentDetails.fromJson(Map<String, dynamic> json) => DeliveryAgentDetails(
     deliveryAgentId: json["delivery_agent_id"],

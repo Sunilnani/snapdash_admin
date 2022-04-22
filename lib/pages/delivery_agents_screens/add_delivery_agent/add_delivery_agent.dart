@@ -12,6 +12,7 @@ import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/managers/agents_manager.dart';
 import 'package:snapdash_admin/managers/vehicles_manager.dart';
 import 'package:snapdash_admin/models/agentsModels/agent_list_model.dart';
+import 'package:snapdash_admin/models/vehicles/un_assigned_vehicles_list_model.dart';
 import 'package:snapdash_admin/models/vehicles/vehicles_model.dart';
 import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/pages/delivery_agents_screens/add_delivery_agent/add_agent_bank_details.dart';
@@ -1623,22 +1624,24 @@ class _AssignVehicleState extends State<AssignVehicle> {
 
   //PastOrders? pastOrders;
 
-  VechiclesList? vehicles;
-  MyVehiclesList? myVehiclelist;
 
-  Future<void> _fetchVehicles() async {
+
+  UnAssignedVehicles? vehicle;
+  UnAssignedVehiclesList?  vehicleList;
+
+  Future<void> _fetchUnAssignedVehicles() async {
     setState(() {
       _fetching = true;
     });
     try {
-      final response = await vehicleManager.vehicles();
+      final response = await vehicleManager.unAssignedVehicles();
 
       if (response.status == ResponseStatus.SUCCESS) {
         Fluttertoast.showToast(msg: response.message);
-        print("------->past ${(response.data as VechiclesList).toJson()}");
+        print("------->past ${(response.data as UnAssignedVehicles).toJson()}");
         setState(() {
-          vehicles = response.data;
-          myVehiclelist=vehicles!.data[0];
+          vehicle = response.data;
+          vehicleList=vehicle!.data[0];
         });
         setState(() {
           _fetching=false;
@@ -1655,6 +1658,39 @@ class _AssignVehicleState extends State<AssignVehicle> {
     }
   }
 
+  //
+  // VechiclesList? vehicles;
+  // MyVehiclesList? myVehiclelist;
+
+  // Future<void> _fetchVehicles() async {
+  //   setState(() {
+  //     _fetching = true;
+  //   });
+  //   try {
+  //     final response = await vehicleManager.vehicles();
+  //
+  //     if (response.status == ResponseStatus.SUCCESS) {
+  //       Fluttertoast.showToast(msg: response.message);
+  //       print("------->past ${(response.data as VechiclesList).toJson()}");
+  //       setState(() {
+  //         vehicles = response.data;
+  //         myVehiclelist=vehicles!.data[0];
+  //       });
+  //       setState(() {
+  //         _fetching=false;
+  //       });
+  //     } else {
+  //       Fluttertoast.showToast(msg: response.message);
+  //     }
+  //   } catch (err) {
+  //     print(err);
+  //     // run now once
+  //     setState(() {
+  //       _fetching = false;
+  //     });
+  //   }
+  // }
+
 
 
   final modelTypeController = TextEditingController();
@@ -1669,20 +1705,20 @@ class _AssignVehicleState extends State<AssignVehicle> {
 
 
     Map<String, dynamic> map = {
-      "vehicle_id":myVehiclelist?.vehicleId,
+      "vehicle_id":vehicleList?.vehicleId,
 
     };
     widget.onNext(map);
   }
-  _goEdit() async {
-
-
-    Map<String, dynamic> map = {
-      "vehicle_id":myVehiclelist?.vehicleId,
-      "agent_id":widget.agentdetails!.deliveryAgentId
-    };
-    widget.onNext(map);
-  }
+  // _goEdit() async {
+  //
+  //
+  //   Map<String, dynamic> map = {
+  //     "vehicle_id":myVehiclelist?.vehicleId,
+  //     "agent_id":widget.agentdetails!.deliveryAgentId
+  //   };
+  //   widget.onNext(map);
+  // }
 
   String dropdownvalue = 'Item 1';
 
@@ -1690,13 +1726,13 @@ class _AssignVehicleState extends State<AssignVehicle> {
 
   void _checkSelectionIfEdit(){
 
-    if(myVehiclelist != null){
+    if(vehicleList != null){
 
-    modelNumberController.text=myVehiclelist!.modelNumber;
-    modelTypeController.text=myVehiclelist!.modelType;
-    engineNumberController.text=myVehiclelist!.engineNumber;
-    chasisNumberController.text=myVehiclelist!.chassisNumber;
-    licencePlateController.text=myVehiclelist!.licenceNumber;
+    modelNumberController.text=vehicleList!.modelNumber;
+    modelTypeController.text=vehicleList!.modelType;
+    engineNumberController.text=vehicleList!.engineNumber;
+    chasisNumberController.text=vehicleList!.chassisNumber;
+    licencePlateController.text=vehicleList!.licenceNumber;
 
 
     }
@@ -1721,8 +1757,9 @@ bool isChange=false;
     // TODO: implement initState
     super.initState();
 
-    _fetchVehicles();
+   // _fetchVehicles();
     _checkIfEdit();
+    _fetchUnAssignedVehicles();
   }
 
   @override
@@ -1829,7 +1866,7 @@ bool isChange=false;
                     //     }
                     // ),
                     SizedBox(height: 120,),
-                    if(vehicles?.data != null)
+                    if(vehicle?.data != null)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1854,17 +1891,17 @@ bool isChange=false;
                                         width: 1,
                                         color: Color(0xFFD1D5DB),
                                       )),
-                                  child: DropdownButton<MyVehiclesList>(
+                                  child: DropdownButton<UnAssignedVehiclesList>(
                                     isExpanded: true,
                                     underline:
                                     DropdownButtonHideUnderline(child: Container()),
-                                    value: myVehiclelist,
+                                    value: vehicleList,
                                     icon: const Icon(
                                       Icons.keyboard_arrow_down,
                                       size: 15,
                                       color:Colors.red,
                                     ),
-                                    items: vehicles?.data.map<DropdownMenuItem<MyVehiclesList>>((value) {
+                                    items: vehicle?.data.map<DropdownMenuItem<UnAssignedVehiclesList>>((value) {
                                       return DropdownMenuItem(
                                         value: value,
                                         child: Text(
@@ -1880,7 +1917,7 @@ bool isChange=false;
                                       print("${value?.vehicleId}");
                                       setState(() {
                                         dropdownvalue = value?.vehicleName as String;
-                                        myVehiclelist=value;
+                                        vehicleList=value;
                                         // if(value!.vehicleId==myVehiclelist!.vehicleId){
                                         //
                                         // }
@@ -1922,7 +1959,7 @@ bool isChange=false;
                                     //    LengthLimitingTextInputFormatter(20)
                                     //  ],
                                     decoration: InputDecoration(
-                                        hintText: "${myVehiclelist!.modelType}",
+                                        hintText: "${vehicleList!.modelType}",
                                         hintStyle: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
@@ -1966,7 +2003,7 @@ bool isChange=false;
                                     //    LengthLimitingTextInputFormatter(20)
                                     //  ],
                                     decoration: InputDecoration(
-                                        hintText: "${myVehiclelist!.modelNumber}",
+                                        hintText: "${vehicleList!.modelNumber}",
                                         hintStyle: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
@@ -2009,7 +2046,7 @@ bool isChange=false;
                                     //    LengthLimitingTextInputFormatter(20)
                                     //  ],
                                     decoration: InputDecoration(
-                                      hintText: "${myVehiclelist!.engineNumber}",
+                                      hintText: "${vehicleList!.engineNumber}",
                                         hintStyle: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
@@ -2052,7 +2089,7 @@ bool isChange=false;
                                     //    LengthLimitingTextInputFormatter(20)
                                     //  ],
                                     decoration: InputDecoration(
-                                        hintText: "${myVehiclelist!.chassisNumber}",
+                                        hintText: "${vehicleList!.chassisNumber}",
                                         hintStyle: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
@@ -2102,7 +2139,7 @@ bool isChange=false;
                                     //    LengthLimitingTextInputFormatter(20)
                                     //  ],
                                     decoration: InputDecoration(
-                                        hintText: "${myVehiclelist!.licenceNumber}",
+                                        hintText: "${vehicleList!.licenceNumber}",
                                         hintStyle: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,

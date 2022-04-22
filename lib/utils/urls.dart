@@ -29,6 +29,7 @@ class URLS {
   static String addVehicle="/api/v1/vehicles/";
   static String updateVehicle="/api/v1/vehicles/";
   static String deleteVehicle="/api/v1/vehicles/";
+  static String unAssignedVehicles="/api/v1/vehicles/?vehicle_status=1";
 
 
 
@@ -42,6 +43,11 @@ class URLS {
   static String userList="/api/v1/users/";
   static String userDetails(String userId) =>
       "/api/v1/user_details/?user_id=$userId";
+  static String userCancelledOrder(String userId)=>"/api/v1/user_orders_list/?user_id=$userId&cancelled_orders=5";
+  static String userPlacedOrder(String usersId)=>"/api/v1/user_orders_list/?user_id=$usersId&placed_orders=6,7,8";
+
+  //static String userCancelled="/api/v1/user_orders_list/?user_id=2&cancelled_orders=5";
+
 
 
   static String ordersList="/api/v1/orders/";

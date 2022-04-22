@@ -9,6 +9,7 @@ import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/pages/orders_screens/order_details.dart';
 import 'package:snapdash_admin/pages/orders_screens/widgets/drop_down_widget.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:snapdash_admin/utils/custom_date.dart';
 class Orders extends StatefulWidget {
   const Orders({Key? key}) : super(key: key);
 
@@ -254,7 +255,7 @@ class _OrdersState extends State<Orders> {
               left: 70,
               right: 70,
               bottom: 30,
-              child:orders == null ? CustomCircularProgressIndicator(): Container(
+              child:orders == null ? Center(child: CustomCircularProgressIndicator()): Container(
                 height: MediaQuery.of(context).size.height*0.7,
                 clipBehavior: Clip.antiAliasWithSaveLayer,
 
@@ -288,7 +289,7 @@ class _OrdersState extends State<Orders> {
                       DataColumn(label: Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     ],
                     rows: List.generate(orders!.data.length, (index) {
-                      final date = "23-10-2022";
+                      final date = CustomDate().formatServerDate(orders!.data[index].createdAt);
                       final orderId = orders!.data[index].orderId;
                       final name = orders!.data[index].userName;
                       final categoryName = orders!.data[index].categoryName;;
@@ -316,7 +317,7 @@ class _OrdersState extends State<Orders> {
                             DataCell(
                                 Container( child: Text(categoryName))),
                             DataCell(Container( child: Text(paymentMethod))),
-                            DataCell(Container( child: Text("${orderSttatus}",style: AppColors.subheadingred,))),
+                            DataCell(Container( child: "${orderSttatus}"=="8"?Text("Delivered",style: AppColors.subheadingGreen,):Text("Accepted",style: AppColors.subheadingred,))),
                             DataCell(Container( child: Text("c ${grandTotal}"))),
                             DataCell(view),
                             DataCell(Text("${orderPicked}")),

@@ -413,7 +413,7 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Make/Model",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text(agentDetails!.vehicleDetails.modelType?? "",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text("${agentDetails!.vehicleDetails.modelType}"?? "",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
             ],
           ),
           SizedBox(height: 15,),
@@ -422,7 +422,7 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Registration Date",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text(agentDetails!.vehicleDetails.registrationDate?? "",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text("${agentDetails!.vehicleDetails.registrationDate}" ?? "",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
             ],
           ),
           SizedBox(height: 15,),
@@ -492,7 +492,7 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Account Holder Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text(agentDetails!.bankDetails.accountHolderName??"No name",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text("${agentDetails!.bankDetails.accountHolderName}"??"No name",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
             ],
           ),
           SizedBox(height: 15,),
@@ -501,7 +501,7 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Account Number",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text(agentDetails!.bankDetails.accountNumber??"No number",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text("${agentDetails!.bankDetails.accountNumber}"??"No number",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
             ],
           ),
           SizedBox(height: 15,),
@@ -510,7 +510,7 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("IFSC Code",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-              Text(agentDetails!.bankDetails.ifscNumber??"Empty",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+              Text("${agentDetails!.bankDetails.ifscNumber}"??"Empty",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
             ],
           ),
           SizedBox(height: 15,),

@@ -1,15 +1,61 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/base_home_page.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/user_managers.dart';
+import 'package:snapdash_admin/models/users_models/user_cancelled_orders_model.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:snapdash_admin/utils/custom_date.dart';
+import 'package:snapdash_admin/utils/urls.dart';
 class CancelledOrders extends StatefulWidget {
-  const CancelledOrders({Key? key}) : super(key: key);
+  const CancelledOrders({Key? key, required this.userId}) : super(key: key);
+  final int userId;
 
   @override
   State<CancelledOrders> createState() => _CancelledOrdersState();
 }
 
 class _CancelledOrdersState extends State<CancelledOrders> {
+
+  bool  _fetching = false;
+  UserCancelledOrdersModel? cancelledOrders;
+
+  Future<void> _fetchCancelledOrders() async {
+    setState(() {
+      _fetching = true;
+    });
+    try {
+      final response = await userManager.userCancelledOrders(widget.userId);
+
+      if (response.status == ResponseStatus.SUCCESS) {
+        Fluttertoast.showToast(msg: response.message);
+        print("------->user Cancelled Orders ${(response.data).toJson()}");
+        print("---------------------> user Id ${widget.userId}");
+        setState(() {
+          cancelledOrders = response.data;
+        });
+        setState(() {
+          _fetching=false;
+        });
+      } else {
+        Fluttertoast.showToast(msg: response.message);
+      }
+    } catch (err) {
+      print(err);
+      // run now once
+      setState(() {
+        _fetching = false;
+      });
+    }
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchCancelledOrders();
+  }
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
@@ -107,7 +153,8 @@ class _CancelledOrdersState extends State<CancelledOrders> {
                           color: Colors.black.withOpacity(0.4))
                     ]
                 ),
-                child: Container(
+                child:cancelledOrders == null?Center(child: Text("No Cancelled Orders",style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),),) :
+                Container(
                   width: double.infinity,
                   child: DataTable(
                     decoration: BoxDecoration(
@@ -136,17 +183,29 @@ class _CancelledOrdersState extends State<CancelledOrders> {
                       DataColumn(label: Text('Grand Total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                       DataColumn(label: Text('Agent Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
                     ],
-                    rows: List.generate(3, (index) {
-                      final date = "23-10-2022";
-                      final orderId = "#12344";
-                      final image = "image";
-                      final orderType = "Books";
-                      final userName = "Sandy";
-                      final paymentMethod = "COD";
-                      final orderStatus = "Cancelled";
-                      final grandTotal = "c 20";
+                    rows: List.generate(cancelledOrders!.data.length, (index) {
+                      final date = CustomDate().formatServerDate(cancelledOrders!.data[index].createdAt);
+                      final orderId = cancelledOrders!.data[index].orderId;
+                      final image = Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                      image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: CachedNetworkImageProvider(URLS.parseImage(cancelledOrders!.data[index].itemImage ?? "",
+                      ),
+                      ),
 
-                      final orderPicked = "peter st";
+                      ),
+
+                      ));
+                      final orderType = cancelledOrders!.data[index].categoryName;
+                      final userName = cancelledOrders!.data[index].userName;
+                      final paymentMethod = cancelledOrders!.data[index].paymentMode;
+                      final orderStatus = cancelledOrders!.data[index].status;
+                      final grandTotal = "c ${cancelledOrders!.data[index].price}";
+
+                      final orderPicked = cancelledOrders!.data[index].receiverName;
 
 
                       return DataRow(
@@ -158,23 +217,21 @@ class _CancelledOrdersState extends State<CancelledOrders> {
                               Text(date),
                             ),
                             DataCell(
-                              Text(orderId),
+                              Text("${orderId}"),
 
                             ),
                             DataCell(
                               Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: Container(
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      borderRadius: BorderRadius.circular(4),
-                                      color: AppColors.appColor),
-                                  // child: ImageWidget(
-                                  //     imageUrl: URLS.buildImageUrl(
-                                  //         "${image}"))
-                                  child: Text(image),
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: AppColors.appColor),
+                                    child: image
+
                                 ),
                               ),
                             ),
@@ -184,7 +241,7 @@ class _CancelledOrdersState extends State<CancelledOrders> {
                             DataCell(
                                 Container( child: Text(userName))),
                             DataCell(Container( child: Text(paymentMethod))),
-                            DataCell(Container( child: Text(orderStatus,style: AppColors.subheadingred,))),
+                            DataCell(Container( child: Text("${orderStatus}",style: AppColors.subheadingred,))),
                             DataCell(Container( child: Text(grandTotal))),
                             DataCell(Text(orderPicked)),
 
@@ -195,75 +252,6 @@ class _CancelledOrdersState extends State<CancelledOrders> {
 
 
 
-                // child: Column(
-                //   crossAxisAlignment: CrossAxisAlignment.start,
-                //   children: [
-                //     Container(
-                //       color: AppColors.lightblue,
-                //       height: 60,
-                //       //alignment: Alignment.center,
-                //       child: Row(
-                //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //         children: [
-                //           Text('Date',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           Text('Order Id',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           Text('Order Type',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           Text('User Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           Text('Payment Method',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           Text('Order Status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           Text('Grand total',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //           Text('Order Picked',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),
-                //         ],
-                //       ),
-                //     ),
-                //     SizedBox(height: 10,),
-                //     ListView.builder(
-                //         padding: EdgeInsets.only(
-                //           top: 20,
-                //         ),
-                //         shrinkWrap: true,
-                //         // separatorBuilder: (_, __) => Divider(height: 2,color: Colors.white,),
-                //         physics: NeverScrollableScrollPhysics(),
-                //         scrollDirection: Axis.vertical,
-                //         itemCount: 5,
-                //
-                //         itemBuilder: (context, index) {
-                //           return InkWell(
-                //             onTap:(){
-                //               //NavigationService().navigatePage(OrderDetails());
-                //             },
-                //             child: Padding(
-                //               padding: const EdgeInsets.only(bottom: 40.0),
-                //               child: Row(
-                //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //                 children: [
-                //                   Text("25--3-22"),
-                //                   Text("#123"),
-                //                  Container(
-                //                    height: 60,
-                //                    width: 60,
-                //                    decoration: BoxDecoration(
-                //                      borderRadius: BorderRadius.circular(5),
-                //                      color: Colors.yellow
-                //                    ),
-                //                  ),
-                //                   Text("Books"),
-                //                   Text("Mike"),
-                //                   Text("Cash"),
-                //                   Text("Ready to pick",style: TextStyle(color: AppColors.red),),
-                //                   Text("c 20"),
-                //                   Text("Mike Jacob"),
-                //
-                //                 ],
-                //               ),
-                //             ),
-                //           );
-                //         })
-                //
-                //
-                //   ],
-                // ),
               ),
             ),
 

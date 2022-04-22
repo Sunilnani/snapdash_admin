@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -441,11 +442,11 @@ class _AddVehicleState extends State<AddVehicle> {
                                         ),
                                          controller: nameController,
                                         cursorColor: AppColors.appColor,
-                                        // keyboardType: TextInputType.phone,
-                                        //  inputFormatters: <TextInputFormatter>[
-                                        //    FilteringTextInputFormatter.digitsOnly,
-                                        //    LengthLimitingTextInputFormatter(20)
-                                        //  ],
+                                        keyboardType: TextInputType.name,
+                                         inputFormatters: <TextInputFormatter>[
+                                           FilteringTextInputFormatter.singleLineFormatter,
+                                           LengthLimitingTextInputFormatter(15)
+                                         ],
                                         decoration: InputDecoration(
                                           //hintText: "Search here",
                                             hintStyle: TextStyle(
@@ -482,11 +483,11 @@ class _AddVehicleState extends State<AddVehicle> {
                                         ),
                                          controller: modelTypeController,
                                         cursorColor: AppColors.appColor,
-                                        // keyboardType: TextInputType.phone,
-                                        //  inputFormatters: <TextInputFormatter>[
-                                        //    FilteringTextInputFormatter.digitsOnly,
-                                        //    LengthLimitingTextInputFormatter(20)
-                                        //  ],
+                                        keyboardType: TextInputType.name,
+                                         inputFormatters: <TextInputFormatter>[
+                                           FilteringTextInputFormatter.singleLineFormatter,
+                                           LengthLimitingTextInputFormatter(15)
+                                         ],
                                         decoration: InputDecoration(
                                           //hintText: "Search here",
                                             hintStyle: TextStyle(
@@ -523,11 +524,11 @@ class _AddVehicleState extends State<AddVehicle> {
                                         ),
                                          controller: modelNumberController,
                                         cursorColor: AppColors.appColor,
-                                        // keyboardType: TextInputType.phone,
-                                        //  inputFormatters: <TextInputFormatter>[
-                                        //    FilteringTextInputFormatter.digitsOnly,
-                                        //    LengthLimitingTextInputFormatter(20)
-                                        //  ],
+                                        keyboardType: TextInputType.phone,
+                                         inputFormatters: <TextInputFormatter>[
+                                           FilteringTextInputFormatter.digitsOnly,
+                                           LengthLimitingTextInputFormatter(15)
+                                         ],
                                         decoration: InputDecoration(
                                           //hintText: "Search here",
                                             hintStyle: TextStyle(
@@ -565,10 +566,10 @@ class _AddVehicleState extends State<AddVehicle> {
                                         controller: licenceNumberController,
                                         cursorColor: AppColors.appColor,
                                         // keyboardType: TextInputType.phone,
-                                        //  inputFormatters: <TextInputFormatter>[
-                                        //    FilteringTextInputFormatter.digitsOnly,
-                                        //    LengthLimitingTextInputFormatter(20)
-                                        //  ],
+                                         inputFormatters: <TextInputFormatter>[
+                                           // FilteringTextInputFormatter.singleLineFormatter,
+                                           LengthLimitingTextInputFormatter(10)
+                                         ],
                                         decoration: InputDecoration(
                                           //hintText: "Search here",
                                             hintStyle: TextStyle(
@@ -605,11 +606,11 @@ class _AddVehicleState extends State<AddVehicle> {
                                         ),
                                          controller: engineNumberController,
                                         cursorColor: AppColors.appColor,
-                                        // keyboardType: TextInputType.phone,
-                                        //  inputFormatters: <TextInputFormatter>[
-                                        //    FilteringTextInputFormatter.digitsOnly,
-                                        //    LengthLimitingTextInputFormatter(20)
-                                        //  ],
+                                        keyboardType: TextInputType.phone,
+                                         inputFormatters: <TextInputFormatter>[
+                                           FilteringTextInputFormatter.digitsOnly,
+                                           LengthLimitingTextInputFormatter(10)
+                                         ],
                                         decoration: InputDecoration(
                                           //hintText: "Search here",
                                             hintStyle: TextStyle(
@@ -651,10 +652,10 @@ class _AddVehicleState extends State<AddVehicle> {
                                          controller: chasisNumberController,
                                         cursorColor: AppColors.appColor,
                                         // keyboardType: TextInputType.phone,
-                                        //  inputFormatters: <TextInputFormatter>[
-                                        //    FilteringTextInputFormatter.digitsOnly,
-                                        //    LengthLimitingTextInputFormatter(20)
-                                        //  ],
+                                         inputFormatters: <TextInputFormatter>[
+                                           FilteringTextInputFormatter.digitsOnly,
+                                           LengthLimitingTextInputFormatter(20)
+                                         ],
                                         decoration: InputDecoration(
                                           //hintText: "Search here",
                                             hintStyle: TextStyle(
@@ -729,38 +730,6 @@ class _AddVehicleState extends State<AddVehicle> {
                                       ),
                                     ),
 
-                                    // Container(
-                                    //   padding: EdgeInsets.only(left: 14, right: 14),
-                                    //   height: 50,
-                                    //   width: MediaQuery.of(context).size.width*0.25,
-                                    //   decoration: BoxDecoration(
-                                    //       shape: BoxShape.rectangle,
-                                    //       borderRadius: BorderRadius.circular(4),
-                                    //       color: AppColors.whitecolor,
-                                    //       border: Border.all(color: AppColors.grey)
-                                    //   ),
-                                    //   child:TextField(
-                                    //     style: TextStyle(
-                                    //       fontSize: 18,
-                                    //       fontWeight: FontWeight.w600,
-                                    //     ),
-                                    //     // controller: numberController,
-                                    //     cursorColor: AppColors.appColor,
-                                    //     // keyboardType: TextInputType.phone,
-                                    //     //  inputFormatters: <TextInputFormatter>[
-                                    //     //    FilteringTextInputFormatter.digitsOnly,
-                                    //     //    LengthLimitingTextInputFormatter(20)
-                                    //     //  ],
-                                    //     decoration: InputDecoration(
-                                    //       //hintText: "Search here",
-                                    //         hintStyle: TextStyle(
-                                    //             fontSize: 14,
-                                    //             fontWeight: FontWeight.w500,
-                                    //             color: Colors.grey[500]),
-                                    //         border: InputBorder.none),
-                                    //   ),
-                                    //
-                                    // ),
                                   ],
                                 ),
                                 SizedBox(height: 30,),
@@ -851,10 +820,10 @@ class _AddVehicleState extends State<AddVehicle> {
                                          controller: insuranceNumberController,
                                         cursorColor: AppColors.appColor,
                                         // keyboardType: TextInputType.phone,
-                                        //  inputFormatters: <TextInputFormatter>[
-                                        //    FilteringTextInputFormatter.digitsOnly,
-                                        //    LengthLimitingTextInputFormatter(20)
-                                        //  ],
+                                         inputFormatters: <TextInputFormatter>[
+                                          // FilteringTextInputFormatter.digitsOnly,
+                                           LengthLimitingTextInputFormatter(10)
+                                         ],
                                         decoration: InputDecoration(
                                           //hintText: "Search here",
                                             hintStyle: TextStyle(
@@ -957,10 +926,10 @@ class _AddVehicleState extends State<AddVehicle> {
                                         controller: vehicleStatusController,
                                         cursorColor: AppColors.appColor,
                                         // keyboardType: TextInputType.phone,
-                                        //  inputFormatters: <TextInputFormatter>[
-                                        //    FilteringTextInputFormatter.digitsOnly,
-                                        //    LengthLimitingTextInputFormatter(20)
-                                        //  ],
+                                         inputFormatters: <TextInputFormatter>[
+                                           FilteringTextInputFormatter.digitsOnly,
+                                           LengthLimitingTextInputFormatter(1)
+                                         ],
                                         decoration: InputDecoration(
                                           //hintText: "Search here",
                                             hintStyle: TextStyle(

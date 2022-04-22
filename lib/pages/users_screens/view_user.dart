@@ -11,6 +11,7 @@ import 'package:snapdash_admin/pages/orders_screens/widgets/drop_down_widget.dar
 import 'package:snapdash_admin/pages/users_screens/cancelled_orders.dart';
 import 'package:snapdash_admin/pages/users_screens/placed_orders.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:snapdash_admin/utils/custom_date.dart';
 import 'package:snapdash_admin/utils/urls.dart';
 class ViewUser extends StatefulWidget {
   ViewUser({required this.userId});
@@ -24,41 +25,56 @@ class _ViewUserState extends State<ViewUser> {
 
 
 
-  UsersDetailsModel? userDetails;
-
+  UserDetailsModel? userDetails;
   bool _fetching=false;
+  var address;
 
   Future<void> _fetchUserDetails() async {
     setState(() {
       _fetching = true;
     });
     print("..........responsed");
-    print("-------->order id is ${widget.userId}");
-    final response = await userManager
-        .fetchUserDetail(widget.userId);
-    //print((response.data as OngoingOrderDetails).toJson());
+    print("-------->order id is  here ${widget.userId}");
+    final response = await userManager.fetchUserDetail(widget.userId);
+   // print((response.data as UserDetailsModel).toJson());
     print(response.data);
     setState(() {
       _fetching = false;
     });
 
+    print("-------->order id is  here ${widget.userId}");
     if (response.status == ResponseStatus.SUCCESS) {
       Fluttertoast.showToast(msg: response.message);
       setState(() {
         userDetails = response.data;
       });
+      print("003");
+
+      if(userDetails != null){
+
+        setState(() {
+          address = userDetails!.address.toString().split(",");
+          //deliveryAddress=orderDetails!.deliveryAddress.split(",");
+        });
+      }
+      print("004");
 
       // print(orderDetails?.OrderDetails?.productImages);
     } else {
       Fluttertoast.showToast(msg: response.message);
     }
+    print("005");
+
   }
 
   @override
   void initState() {
     // TODO: implement initState
-
+    print("001");
     _fetchUserDetails();
+
+    print("002");
+
   }
   @override
   Widget build(BuildContext context) {
@@ -123,6 +139,7 @@ class _ViewUserState extends State<ViewUser> {
             ),
 
 
+
             Positioned(
               top: 180,
               left: 150,
@@ -168,13 +185,13 @@ class _ViewUserState extends State<ViewUser> {
                             children: [
                               Row(
                                 children: [
-                                  Container(
+                                  if (userDetails!.image==null) SizedBox() else Container(
                                       height: 100,
                                       width: 100,
                                       decoration: BoxDecoration(
                                         color: Colors.grey,
                                         shape: BoxShape.circle,
-                                        image: DecorationImage(
+                                        image:  DecorationImage(
                                           fit: BoxFit.fill,
                                           image: CachedNetworkImageProvider(URLS.parseImage(userDetails!.image ?? "",
                                           ),
@@ -202,7 +219,7 @@ class _ViewUserState extends State<ViewUser> {
                               ),
                               InkWell(
                                 onTap: (){
-                                  NavigationService().navigatePage(CancelledOrders());
+                                  NavigationService().navigatePage(CancelledOrders(userId: userDetails!.userId,));
                                 },
                                 child: Row(
                                   children: [
@@ -234,7 +251,7 @@ class _ViewUserState extends State<ViewUser> {
                               ),
                               InkWell(
                                 onTap: (){
-                                  NavigationService().navigatePage(PlacedOrders());
+                                  NavigationService().navigatePage(PlacedOrders(userId: userDetails!.userId,));
                                 },
                                 child: Row(
                                   children: [
@@ -286,35 +303,26 @@ class _ViewUserState extends State<ViewUser> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text("First Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text("Sunil",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        Text("User Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        Text(userDetails!.userName??"No Name",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                       ],
                                     ),
                                     SizedBox(height: 20,),
 
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text("Last Name",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text("Chowdary",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20,),
-
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text("Email ID",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text("sunil@123",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20,),
+                                    // Row(
+                                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    //   children: [
+                                    //     Text("Email ID",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                    //     Text("sunil@123",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                    //   ],
+                                    // ),
+                                    // SizedBox(height: 20,),
 
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text("Date of Birth",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text("298-05-1197",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        Text(CustomDate().formatServerDate(userDetails!.created??DateTime.now()),style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                       ],
                                     ),
                                     SizedBox(height: 20,),
@@ -323,15 +331,24 @@ class _ViewUserState extends State<ViewUser> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text("Mobbile Number",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text("9990909090",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        Text("${userDetails!.phoneNumber}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                       ],
                                     ),
                                     SizedBox(height: 20,),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
+                                        Text("Area",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        Text(address[0],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20,),
+
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
                                         Text("Street",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text("Lake View",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        Text(address[1],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                       ],
                                     ),
                                     SizedBox(height: 20,),
@@ -340,16 +357,7 @@ class _ViewUserState extends State<ViewUser> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text("City",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text("Hyderabad",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20,),
-
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text("pincode",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text("0020304",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        Text(address[2],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                       ],
                                     ),
 

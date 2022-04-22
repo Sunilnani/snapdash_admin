@@ -1,15 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:snapdash_admin/base_home_page.dart';
+import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/user_managers.dart';
+import 'package:snapdash_admin/models/users_models/placed_order_model.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 class PlacedOrders extends StatefulWidget {
-  const PlacedOrders({Key? key}) : super(key: key);
+  const PlacedOrders({Key? key,required this.userId}) : super(key: key);
+  final int userId;
 
   @override
   State<PlacedOrders> createState() => _PlacedOrdersState();
 }
 
 class _PlacedOrdersState extends State<PlacedOrders> {
+  bool  _fetching = false;
+  UserPlacedOrdersModel? placedOrders;
+
+  Future<void> _fetchPlacedOrders() async {
+    setState(() {
+      _fetching = true;
+    });
+    try {
+      final response = await userManager.userPlacedOrders(widget.userId);
+
+      if (response.status == ResponseStatus.SUCCESS) {
+        Fluttertoast.showToast(msg: response.message);
+        print("------->user placed Orders ${(response.data).toJson()}");
+        print("---------------------> user Id ${widget.userId}");
+        setState(() {
+          placedOrders = response.data;
+        });
+        setState(() {
+          _fetching=false;
+        });
+      } else {
+        Fluttertoast.showToast(msg: response.message);
+      }
+    } catch (err) {
+      print(err);
+      // run now once
+      setState(() {
+        _fetching = false;
+      });
+    }
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchPlacedOrders();
+  }
   @override
   Widget build(BuildContext context) {
     return BaseHomePage(
@@ -107,7 +150,8 @@ class _PlacedOrdersState extends State<PlacedOrders> {
                           color: Colors.black.withOpacity(0.4))
                     ]
                 ),
-                child: Container(
+                child: placedOrders == null ? Center(child: CustomCircularProgressIndicator(),):
+                Container(
                   width: double.infinity,
                   child: DataTable(
                     decoration: BoxDecoration(
