@@ -30,6 +30,7 @@ class URLS {
   static String updateVehicle="/api/v1/vehicles/";
   static String deleteVehicle="/api/v1/vehicles/";
   static String unAssignedVehicles="/api/v1/vehicles/?vehicle_status=1";
+  static String searchVehicles(String? query)=>"/api/v1/vehicles/?search_text=$query";
 
 
 
@@ -53,6 +54,9 @@ class URLS {
   static String ordersList="/api/v1/orders/";
   static String orderDetails(String orderId) =>
       "/api/v1/order_details/?order_id=$orderId";
+
+  static String profileData="/api/v1/admin_details/";
+  static String updateProfile="/api/v1/admin_profile/";
 
 
   static String parseImage(String? url) {

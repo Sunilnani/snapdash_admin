@@ -1,6 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
+import 'package:snapdash_admin/managers/profile_manager.dart';
+import 'package:snapdash_admin/models/profileModels/profile_details_model.dart';
 import 'package:snapdash_admin/my_account.dart';
+import 'package:snapdash_admin/network_calls/base_response.dart';
+import 'package:snapdash_admin/notifiers/user_notifier.dart';
 import 'package:snapdash_admin/pages/active_areas_screens/active_orders.dart';
 import 'package:snapdash_admin/pages/delivery_agents_screens/delivery_agents.dart';
 import 'package:snapdash_admin/pages/my_vehicles_screens/my_vehicles.dart';
@@ -8,6 +16,7 @@ import 'package:snapdash_admin/pages/orders_screens/orders.dart';
 import 'package:snapdash_admin/pages/payouts_screens/statistics.dart';
 import 'package:snapdash_admin/pages/users_screens/users.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:snapdash_admin/utils/urls.dart';
 
 class TopAppBar extends StatefulWidget implements PreferredSizeWidget {
   const TopAppBar({Key? key, this.activeIndex}) : super(key: key);
@@ -23,6 +32,39 @@ class TopAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _TopAppBarState extends State<TopAppBar> {
+
+  bool _fetching =false;
+  ProfileModel? profile;
+
+  Future<void> _fetchProfile() async {
+    setState(() {
+      _fetching = true;
+    });
+    try {
+      final response = await profileManager.profileData();
+
+      if (response.status == ResponseStatus.SUCCESS) {
+        Fluttertoast.showToast(msg: response.message);
+        // print("------->Agents ${(response.data as AgentsListModel).toJson()}");
+        setState(() {
+          profile = response.data;
+        });
+        setState(() {
+          _fetching=false;
+        });
+      } else {
+        Fluttertoast.showToast(msg: response.message);
+      }
+    } catch (err) {
+      print(err);
+      // run now once
+      setState(() {
+        _fetching = false;
+      });
+    }
+  }
+
+
   List<String> TabsList = [
     "My Vehicles",
     "Delivery Agents",
@@ -32,6 +74,19 @@ class _TopAppBarState extends State<TopAppBar> {
     "Active Areas",
 
   ];
+
+  Future<void> _openAddProfile({ProfileModel? profile})async{
+    await NavigationService().navigatePage(MyProfile(profileData:profile));
+    await _fetchProfile();
+
+  }
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _fetchProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,16 +165,51 @@ class _TopAppBarState extends State<TopAppBar> {
                 SizedBox(
                   width: 40,
                 ),
-                InkWell(
-                  onTap: (){
-                    NavigationService().navigatePage(MyProfile());
-                  },
-                  child: CircleAvatar(
-                    radius: 20,
-                     backgroundColor: AppColors.red,
-                   // backgroundImage: AssetImage("assets/profile.png"),
-                  ),
-                )
+
+                Consumer<UserNotifier>(builder: (context, provider, child) {
+                  final user = provider.user;
+                  if (user == null) {
+                    return const SizedBox();
+                  }
+                  return InkWell(
+                    onTap: (){
+                      // NavigationService().navigatePage(MyProfile());
+                      _openAddProfile();
+                    },
+                    child:user.image == null?
+
+                    Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+
+                        ))
+                        : Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: CachedNetworkImageProvider(
+                              URLS.parseImage(
+                                provider.user!.image ,
+                              ),
+                            ),
+                          ),
+                        )),
+                    // child: CircleAvatar(
+                    //   radius: 20,
+                    //    backgroundColor: AppColors.red,
+                    //  // backgroundImage: AssetImage("assets/profile.png"),
+                    // ),
+                  );
+                }),
+
+
+
+
               ],
             ),
           )

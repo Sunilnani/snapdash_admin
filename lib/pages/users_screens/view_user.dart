@@ -13,6 +13,9 @@ import 'package:snapdash_admin/pages/users_screens/placed_orders.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
 import 'package:snapdash_admin/utils/custom_date.dart';
 import 'package:snapdash_admin/utils/urls.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
+
+
 class ViewUser extends StatefulWidget {
   ViewUser({required this.userId});
   final int? userId;
@@ -50,10 +53,10 @@ class _ViewUserState extends State<ViewUser> {
       });
       print("003");
 
-      if(userDetails != null){
+      if(userDetails!.address != null){
 
         setState(() {
-          address = userDetails!.address.toString().split(",");
+          address = userDetails!.address.split(",");
           //deliveryAddress=orderDetails!.deliveryAddress.split(",");
         });
       }
@@ -67,6 +70,14 @@ class _ViewUserState extends State<ViewUser> {
 
   }
 
+  static final List<WorldPopulation> populationData=[
+    WorldPopulation(year: 0, population: 10, barcolor: Colors.red),
+    WorldPopulation(year: 1, population: 20, barcolor: Colors.pink),
+    WorldPopulation(year: 2, population: 30, barcolor: Colors.yellow),
+    WorldPopulation(year: 3, population: 40, barcolor: Colors.green),
+    WorldPopulation(year: 3, population: 50, barcolor: Colors.green),
+  ];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -78,6 +89,17 @@ class _ViewUserState extends State<ViewUser> {
   }
   @override
   Widget build(BuildContext context) {
+
+    List<charts.Series<WorldPopulation, int>> series=[
+
+      charts.Series(
+          data: populationData,
+          id: "world population",
+          domainFn: (WorldPopulation pops,_)=>pops.year,
+          measureFn:  (WorldPopulation pops,_)=>pops.population,
+          colorFn:  (WorldPopulation pops,_)=>charts.ColorUtil.fromDartColor(pops.barcolor)
+      )
+    ];
     return BaseHomePage(
         activeIndex: 3,
         child: Stack(
@@ -339,7 +361,7 @@ class _ViewUserState extends State<ViewUser> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text("Area",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text(address[0],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        Text("${address[0]}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                       ],
                                     ),
                                     SizedBox(height: 20,),
@@ -348,7 +370,7 @@ class _ViewUserState extends State<ViewUser> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text("Street",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text(address[1],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                        //Text("${address[1]}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                       ],
                                     ),
                                     SizedBox(height: 20,),
@@ -357,7 +379,7 @@ class _ViewUserState extends State<ViewUser> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text("City",style: TextStyle(color: AppColors.grey,fontSize: 14,fontWeight: FontWeight.w600),),
-                                        Text(address[2],style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
+                                       // Text("${address[2]}",style: TextStyle(color: AppColors.darkGrey,fontSize: 14,fontWeight: FontWeight.w600),),
                                       ],
                                     ),
 
@@ -385,6 +407,7 @@ class _ViewUserState extends State<ViewUser> {
                                     ),
                                     SizedBox(height: 25,),
                                     Container(
+                                      padding: EdgeInsets.all(15),
                                       height: 250,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
@@ -397,6 +420,7 @@ class _ViewUserState extends State<ViewUser> {
                                                 color: Colors.black.withOpacity(0.4))
                                           ]
                                       ),
+                                      child: charts.LineChart(series),
                                     )
                                   ],
                                 ),
@@ -416,4 +440,11 @@ class _ViewUserState extends State<ViewUser> {
         )
     );
   }
+}
+class WorldPopulation{
+  final int  year;
+  final int population;
+  final Color barcolor;
+  WorldPopulation({required this.year,required this.population,required this.barcolor});
+
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:snapdash_admin/models/vehicles/search_vehicle_model.dart';
 import 'package:snapdash_admin/models/vehicles/un_assigned_vehicles_list_model.dart';
 import 'package:snapdash_admin/models/vehicles/vehicle_details_model.dart';
 import 'package:snapdash_admin/models/vehicles/vehicles_model.dart';
@@ -179,6 +180,34 @@ class VehiclesManager {
     } on Exception catch (err) {
       var msg = ParseError.parse(err);
       return ResponseData<dynamic>(msg, ResponseStatus.FAILED);
+    }
+  }
+
+  Future<ResponseData> searchVehicle(String? query) async {
+    Response response;
+    print(" s---------${query}");
+    print(URLS.vehicleDetails(query.toString()));
+    try {
+
+      response =
+      await dioClient.ref!.get<dynamic>(URLS.searchVehicles(query));
+
+      if (response.statusCode == 200) {
+
+        print("Check 1 --> ${response.data}");
+        final searchVehicles = searchVehiclesModelFromJson(json.encode(response.data));
+        return ResponseData("", ResponseStatus.SUCCESS, data: searchVehicles);
+      } else {
+        var message = "Unknown error";
+        if (response.data.containsKey("message") == true) {
+          message = response.data['message'];
+        }
+        return ResponseData(message, ResponseStatus.FAILED);
+      }
+    } on Exception catch (err) {
+      print("error is ${err}");
+      // var msg = ParseError.parse(err);
+      return ResponseData<dynamic>('Please check your internet', ResponseStatus.FAILED);
     }
   }
 

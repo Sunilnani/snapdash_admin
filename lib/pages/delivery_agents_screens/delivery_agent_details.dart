@@ -5,8 +5,12 @@ import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/managers/agents_manager.dart';
 import 'package:snapdash_admin/models/agentsModels/agent_details_model.dart';
+import 'package:snapdash_admin/models/charts_model.dart';
+
 import 'package:snapdash_admin/network_calls/base_response.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
+
 class DeliveryAgentDetails extends StatefulWidget {
   DeliveryAgentDetails({
     required this.agentId
@@ -50,6 +54,27 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
       });
     }
   }
+
+  late final List<charts.Series> seriesList;
+  late final bool animate;
+
+
+
+  //
+  // List<charts.Series<TimeSeriesSales, DateTime>> _createSampleData() {
+  //   final data = [
+  //     new TimeSeriesSales(new DateTime(2017, 9, 19), 5),
+  //     new TimeSeriesSales(new DateTime(2017, 9, 26), 25),
+  //     new TimeSeriesSales(new DateTime(2017, 10, 3), 100),
+  //     new TimeSeriesSales(new DateTime(2017, 10, 10), 75),
+  //   ];
+static final List<WorldPopulation> populationData=[
+  WorldPopulation(year: "20", population: 200, barcolor: Colors.red),
+  WorldPopulation(year: "25", population: 220, barcolor: Colors.pink),
+  WorldPopulation(year: "30", population: 100, barcolor: Colors.yellow),
+  WorldPopulation(year: "20", population: 20, barcolor: Colors.green),
+];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -59,6 +84,20 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
 
   @override
   Widget build(BuildContext context) {
+
+List<charts.Series<WorldPopulation, String>> series=[
+
+  charts.Series(
+    data: populationData,
+    id: "world population",
+    domainFn: (WorldPopulation pops,_)=>pops.year,
+    measureFn:  (WorldPopulation pops,_)=>pops.population,
+    colorFn:  (WorldPopulation pops,_)=>charts.ColorUtil.fromDartColor(pops.barcolor)
+  )
+];
+
+
+
     return BaseHomePage(
         activeIndex: 1,
         child: Stack(
@@ -154,6 +193,9 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
               ),
             ),
 
+
+
+
             Positioned(
               top: 170,
               left: 80,
@@ -206,6 +248,7 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
                                     color: Colors.black.withOpacity(0.4))
                               ]
                           ),
+                          child: charts.BarChart(series),
 
                         ),
 
@@ -399,6 +442,7 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("Vehicle Details",style: TextStyle(color: AppColors.red,fontSize: 16,fontWeight: FontWeight.w600),),
+
           SizedBox(height: 30,),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -547,3 +591,11 @@ class _DeliveryAgentDetailsState extends State<DeliveryAgentDetails> {
 
 
 }
+class WorldPopulation{
+  final String  year;
+  final int population;
+  final Color barcolor;
+  WorldPopulation({required this.year,required this.population,required this.barcolor});
+
+}
+

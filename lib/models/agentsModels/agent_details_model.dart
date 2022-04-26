@@ -20,6 +20,11 @@ class AgentDetailsModel {
     required this.vehicleDetails,
     required this.created,
     required this.updated,
+    required this.totalOrders,
+    required this.totalPayOuts,
+    required this.monthlyTravelled,
+    required this.totalDistance,
+    required this.totalOrdersDelivered,
   });
 
   int? deliveryAgentId;
@@ -32,6 +37,11 @@ class AgentDetailsModel {
   VehicleDetails vehicleDetails;
   dynamic? created;
   DateTime updated;
+  int? totalOrders;
+  int? totalPayOuts;
+  double? monthlyTravelled;
+  double? totalDistance;
+  int? totalOrdersDelivered;
 
   factory AgentDetailsModel.fromJson(Map<String, dynamic> json) => AgentDetailsModel(
     deliveryAgentId: json["delivery_agent_id"],
@@ -44,6 +54,11 @@ class AgentDetailsModel {
     vehicleDetails: VehicleDetails.fromJson(json["vehicle_details"]),
     created: json["created"],
     updated: DateTime.parse(json["updated"]),
+    totalOrders: json["total_orders"],
+    totalPayOuts: json["total_payouts"],
+    monthlyTravelled: json["monthly_travel"],
+    totalDistance: json["total_distance"],
+    totalOrdersDelivered: json["total_orders_delivered"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -57,6 +72,13 @@ class AgentDetailsModel {
     "vehicle_details": vehicleDetails.toJson(),
     "created": created,
     "updated": updated.toIso8601String(),
+    "total_orders":totalOrders,
+    "total_payouts":totalPayOuts,
+    "monthly_travel":monthlyTravelled,
+    "total_distance":totalDistance,
+    "total_orders_delivered":totalOrdersDelivered
+
+
   };
 }
 
