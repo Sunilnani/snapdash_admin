@@ -3,14 +3,15 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:snapdash_admin/base_home_page.dart';
 import 'package:snapdash_admin/common/custom_circular_progress_indicator.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/managers/vehicles_manager.dart';
-import 'package:snapdash_admin/models/agentsModels/agent_details_model.dart';
 import 'package:snapdash_admin/models/vehicles/search_vehicle_model.dart';
 import 'package:snapdash_admin/models/vehicles/vehicles_model.dart';
 import 'package:snapdash_admin/network_calls/base_response.dart';
+import 'package:snapdash_admin/notifiers/vehicleNotifier.dart';
 import 'package:snapdash_admin/pages/my_vehicles_screens/add_vehicles.dart';
 import 'package:snapdash_admin/pages/my_vehicles_screens/view_vehicle_details.dart';
 import 'package:snapdash_admin/utils/appColors.dart';
@@ -41,7 +42,7 @@ class _MyVehiclesState extends State<MyVehicles> {
       _fetching = true;
     });
     try {
-      final response = await vehicleManager.vehicles();
+      final response = await vehicleManager.vehicles(query: _searchController.text.trim());
 
       if (response.status == ResponseStatus.SUCCESS) {
         Fluttertoast.showToast(msg: response.message);
@@ -115,39 +116,6 @@ class _MyVehiclesState extends State<MyVehicles> {
   List<SearchVehicleList> _vehiclesList= [];
   int totalPages=1;
 
-
-  Future<void> _fetchSearchVehicles(String? query) async {
-    setState(() {
-      _fetching = true;
-    });
-    try {
-      final response = await vehicleManager.searchVehicle(query??"");
-
-      if (response.status == ResponseStatus.SUCCESS) {
-        Fluttertoast.showToast(msg: response.message);
-        print("------->past ${(response.data as SearchVehicleList).toJson()}");
-        setState(() {
-          searchedVehicles = response.data;
-          _vehiclesList.addAll(searchedVehicles!.data);
-          // NavigationService().navigatePage(ViewVehicleDetails(vehicleId: _vehiclesList[0].vehicleId,));
-          //totalPages=searchedVehicles!.count;
-        });
-        setState(() {
-          _fetching=false;
-        });
-      } else {
-        Fluttertoast.showToast(msg: response.message);
-      }
-    } catch (err) {
-      print(err);
-      // run now once
-      setState(() {
-        _fetching = false;
-      });
-    }
-  }
-
-
   TextEditingController _searchController = TextEditingController();
 
 
@@ -158,7 +126,7 @@ class _MyVehiclesState extends State<MyVehicles> {
       return;
     }
    // _fetchSearchVehicles(query);
-    _fetchSearchVehicles(query);
+    _fetchVehicles();
 
 
 
@@ -194,7 +162,10 @@ class _MyVehiclesState extends State<MyVehicles> {
   var vehicleId;
 
 
-  final PostDataSource _postDataSource = PostDataSource();
+
+
+ // final PostDataSource _postDataSource = PostDataSource(userData: );
+
 
  // final DataTableSource _data = MyData();
 
@@ -221,6 +192,8 @@ class _MyVehiclesState extends State<MyVehicles> {
         activeIndex: 0,
         child: Stack(
           children: [
+
+
             Container(
               height: MediaQuery.of(context).size.height*0.3,
               color: AppColors.bgpink,
@@ -273,6 +246,7 @@ class _MyVehiclesState extends State<MyVehicles> {
                           ),
                           child:TextField(
                             controller: _searchController,
+                            autofocus: true,
                             onSubmitted: (value){
                               _searchVehicles();
                             },
@@ -453,21 +427,14 @@ class _MyVehiclesState extends State<MyVehicles> {
                       ]),
 
                   child: SingleChildScrollView(
-                    // scrollDirection: Axis.vertical,
-                    // child:  PaginatedDataTable(
-                    //   source: _postDataSource,
-                    //   header: const Text('My Products'),
-                    //   columns: const [
-                    //     DataColumn(label: Text('ID')),
-                    //     DataColumn(label: Text('Name')),
-                    //     DataColumn(label: Text('Price'))
-                    //   ],
-                    //   columnSpacing: 100,
-                    //   horizontalMargin: 10,
-                    //   rowsPerPage: 8,
-                    //   showCheckboxColumn: false,
-                    // ),
-                    //controller: _scrollController,
+                    scrollDirection: Axis.vertical,
+
+
+                   //  ChangeNotifierProvider(
+                   //      create: (_) => VehicleNotifier(),
+                   //      child: _InternalWidget()
+                   //  ),
+                   // controller: _scrollController,
 
                     child: DataTable(
                       //source: _postDataSource,
@@ -619,19 +586,6 @@ class _MyVehiclesState extends State<MyVehicles> {
               ),
             ),
 
-            // PaginatedDataTable(
-            //   source: _postDataSource,
-            //   header: const Text('My Products'),
-            //   columns: const [
-            //     DataColumn(label: Text('ID')),
-            //     DataColumn(label: Text('Name')),
-            //     DataColumn(label: Text('Price'))
-            //   ],
-            //   columnSpacing: 100,
-            //   horizontalMargin: 10,
-            //   rowsPerPage: 8,
-            //   showCheckboxColumn: false,
-            // ),
           ],
         )
     );
@@ -684,38 +638,202 @@ class _MyVehiclesState extends State<MyVehicles> {
     );
   }
 
+}
+
+class _InternalWidget extends StatelessWidget {
 
 
+  @override
+  Widget build(BuildContext context) {
+    //
+    final _provider = context.watch<VehicleNotifier>();
+    final _model = _provider.vehicles;
+
+    if (_model!.data.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final _dtSource = PostDataSource(
+      userData: _model,
+    );
+
+    return PaginatedDataTable(
+      source: _dtSource,
+      columnSpacing: 38.0,
+      showCheckboxColumn: false,
+      dataRowHeight: 70,
+      showFirstLastButtons: true,
+      rowsPerPage: PaginatedDataTable.defaultRowsPerPage,
+      columns:  [
+        DataColumn(label:Text('S.NO',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+        DataColumn(label: Text('Image',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+        DataColumn(label: Text('Brand Name',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+        DataColumn(label: Text('Model Type',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+        DataColumn(label: Text('Model Number',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+        DataColumn(label: Text('Licence Palte',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+        DataColumn(label: Text('Vehicle status',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+        DataColumn(label: Text('View',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+        DataColumn(label: Text('Actions',style: TextStyle(color: AppColors.black,fontWeight: FontWeight.w600,fontSize: 14),),),
+      ],
+    );
+  }
 }
 
 class PostDataSource extends DataTableSource{
+  PostDataSource({
+    required VechiclesList? userData,
+   // required this.onRowSelect,
+  })  : _userData = userData,
+        assert(userData != null);
+
+  final VechiclesList? _userData;
+ // final OnRowSelect onRowSelect;
 
 
 
-   final List<MyVehiclesList> _posts=[];
-  int _selectedCount=0;
+
+
+
+
+  //  final List<MyVehiclesList> _posts=[];
+  // int _selectedCount=0;
+  // @override
+  // // TODO: implement rowCount
+  // int get rowCount => _posts.length;
+  // @override
+  // // TODO: implement isRowCountApproximate
+  // bool get isRowCountApproximate => false;
+  // @override
+  // // TODO: implement selectedRowCount
+  // int get selectedRowCount => _selectedCount;
   @override
-  // TODO: implement rowCount
-  int get rowCount => _posts.length;
-  @override
-  // TODO: implement isRowCountApproximate
-  bool get isRowCountApproximate => false;
-  @override
-  // TODO: implement selectedRowCount
-  int get selectedRowCount => _selectedCount;
+//   DataRow getRow(int index) {
+//     assert(index >= 0);
+//
+//     if (index >= _userData.length) {
+//       return null;
+//     }
+//     final _user = _userData[index];
+//
+//   @override
+//   DataRow? getRow(int index) {
+//
+//   //  final MyVehiclesList post= _posts[index];
+//     // TODO: implement getRow
+//     return DataRow.byIndex(index: index ,
+//
+//         cells: <DataCell> [
+//           DataCell(
+//
+//               Text(
+//                   "${1}"
+//               )
+//           ),
+//
+//           DataCell(
+//             Padding(
+//                 padding: const EdgeInsets.all(5.0),
+//                 child: Container(
+//                     height: 40,
+//                     width: 40,
+//                     decoration: BoxDecoration(
+//                       image: DecorationImage(
+//                         fit: BoxFit.fill,
+//                         image: CachedNetworkImageProvider(URLS.parseImage(_user!.vehicleImage ?? "",
+//                         ),
+//                         ),
+//
+//                       ),
+//
+//                     ))
+//             ),
+//           ),
+//
+//           DataCell(
+//               Container( child: Text(_user.vehicleName?? "noo"))),
+//           DataCell(
+//               Container( child: Text(_user.modelType))),
+//
+//           DataCell(Container( child: Text(_user.modelNumber))),
+//           DataCell(Container( child: Text(_user.licenceNumber))),
+//           DataCell(Container( child:"${_user.vehicleStatus}"=="0"?
+//           Image.asset(
+//             "assets/icons/Radio Button.png",
+//             height: 50,
+//             width: 50,
+//           ):
+//
+//           Image.asset(
+//             "assets/icons/notify_off.png",
+//             height: 50,
+//             width: 50,
+//           )
+//
+//           )
+//           ),
+//           DataCell(Container( child: Icon(Icons.remove_red_eye_outlined))),
+//           DataCell(Center(child: Container( child:
+//           Row(
+//             // mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               InkWell(
+//                 onTap:(){
+//                   //_openAddVehicle(vehicle: vehicles!.data[index]);
+//                 },
+//                 child: Container(
+//                   alignment: Alignment.center,
+//                   height: 30,
+//                   width: 30,
+//                   decoration: BoxDecoration(
+//                       borderRadius: BorderRadius.circular(4),
+//                       // border: Border.all(color: AppColors.red)
+//                       color: AppColors.red
+//                   ),
+//                   child:Icon(Icons.person_add_alt,color:AppColors.whitecolor,size: 18,),
+//                 ),
+//               ),
+//               SizedBox(width: 20,),
+//               InkWell(
+//                 onTap:(){
+//                   // _show(index);
+//
+//                 },
+//                 child: Container(
+//                   alignment: Alignment.center,
+//                   height: 30,
+//                   width: 30,
+//                   decoration: BoxDecoration(
+//                       borderRadius: BorderRadius.circular(4),
+//                       border: Border.all(color: AppColors.grey)
+//
+//                   ),
+//                   child: Icon(Icons.delete_forever,size: 18,),
+//                 ),
+//               )
+//             ],
+//           )
+//           ))),
+//         ]);
+//   }
+// }}
+
 
   @override
   DataRow? getRow(int index) {
+    assert(index >= 0);
 
-    final MyVehiclesList post= _posts[index];
-    // TODO: implement getRow
-    return DataRow.byIndex(index: index ,
+    if (index >= _userData!.data.length) {
+      return null;
+    }
+    final _user = _userData!.data[index];
 
+    return DataRow.byIndex(
+      index: index,
+        // DON'T MISS THIS
         cells: <DataCell> [
           DataCell(
 
               Text(
-                  "${1}"
+                  index.toString()
               )
           ),
 
@@ -728,7 +846,7 @@ class PostDataSource extends DataTableSource{
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         fit: BoxFit.fill,
-                        image: CachedNetworkImageProvider(URLS.parseImage(post!.vehicleImage ?? "",
+                        image: CachedNetworkImageProvider(URLS.parseImage(_user!.vehicleImage ?? "",
                         ),
                         ),
 
@@ -739,13 +857,13 @@ class PostDataSource extends DataTableSource{
           ),
 
           DataCell(
-              Container( child: Text(post.vehicleName?? "noo"))),
+              Container( child: Text(_user.vehicleName?? "noo"))),
           DataCell(
-              Container( child: Text(post.modelType))),
+              Container( child: Text(_user.modelType))),
 
-          DataCell(Container( child: Text(post.modelNumber))),
-          DataCell(Container( child: Text(post.licenceNumber))),
-          DataCell(Container( child:"${post.vehicleStatus}"=="0"?
+          DataCell(Container( child: Text(_user.modelNumber))),
+          DataCell(Container( child: Text(_user.licenceNumber))),
+          DataCell(Container( child:"${_user.vehicleStatus}"=="0"?
           Image.asset(
             "assets/icons/Radio Button.png",
             height: 50,
@@ -767,7 +885,7 @@ class PostDataSource extends DataTableSource{
             children: [
               InkWell(
                 onTap:(){
-                  //_openAddVehicle(vehicle: vehicles!.data[index]);
+                 // _openAddVehicle(vehicle: vehicles!.data[index]);
                 },
                 child: Container(
                   alignment: Alignment.center,
@@ -802,6 +920,17 @@ class PostDataSource extends DataTableSource{
             ],
           )
           ))),
-        ]);
+        ]
+    );
   }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => _userData!.data.length;
+
+  @override
+  int get selectedRowCount => 0;
+
 }

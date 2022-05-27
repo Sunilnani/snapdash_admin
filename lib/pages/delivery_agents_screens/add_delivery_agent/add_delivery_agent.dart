@@ -1658,38 +1658,6 @@ class _AssignVehicleState extends State<AssignVehicle> {
     }
   }
 
-  //
-  // VechiclesList? vehicles;
-  // MyVehiclesList? myVehiclelist;
-
-  // Future<void> _fetchVehicles() async {
-  //   setState(() {
-  //     _fetching = true;
-  //   });
-  //   try {
-  //     final response = await vehicleManager.vehicles();
-  //
-  //     if (response.status == ResponseStatus.SUCCESS) {
-  //       Fluttertoast.showToast(msg: response.message);
-  //       print("------->past ${(response.data as VechiclesList).toJson()}");
-  //       setState(() {
-  //         vehicles = response.data;
-  //         myVehiclelist=vehicles!.data[0];
-  //       });
-  //       setState(() {
-  //         _fetching=false;
-  //       });
-  //     } else {
-  //       Fluttertoast.showToast(msg: response.message);
-  //     }
-  //   } catch (err) {
-  //     print(err);
-  //     // run now once
-  //     setState(() {
-  //       _fetching = false;
-  //     });
-  //   }
-  // }
 
 
 
@@ -1710,15 +1678,7 @@ class _AssignVehicleState extends State<AssignVehicle> {
     };
     widget.onNext(map);
   }
-  // _goEdit() async {
-  //
-  //
-  //   Map<String, dynamic> map = {
-  //     "vehicle_id":myVehiclelist?.vehicleId,
-  //     "agent_id":widget.agentdetails!.deliveryAgentId
-  //   };
-  //   widget.onNext(map);
-  // }
+
 
   String dropdownvalue = 'Item 1';
 

@@ -11,7 +11,9 @@ import 'package:snapdash_admin/pages/orders_screens/widgets/drop_down_widget.dar
 import 'package:snapdash_admin/utils/appColors.dart';
 import 'package:snapdash_admin/utils/custom_date.dart';
 class Orders extends StatefulWidget {
-  const Orders({Key? key}) : super(key: key);
+  const Orders({Key? key, this.query, this.name}) : super(key: key);
+  final String? query;
+  final String? name;
 
   @override
   State<Orders> createState() => _OrdersState();
@@ -47,7 +49,7 @@ class _OrdersState extends State<Orders> {
       _fetching = true;
     });
     try {
-      final response = await ordersManager.ordersList();
+      final response = await ordersManager.ordersList(query: _searchController.text.trim(),name: dropdownvalue);
 
       if (response.status == ResponseStatus.SUCCESS) {
         Fluttertoast.showToast(msg: response.message);
@@ -71,13 +73,43 @@ class _OrdersState extends State<Orders> {
   }
 
 
+  TextEditingController _searchController = TextEditingController();
+
+
+  _searchOrder(){
+    final String query=_searchController.text.trim();
+    final String name=dropdownvalue;
+
+    // _fetchSearchVehicles(query);
+    _fetchOrders();
+
+
+
+  }
+
+
+  Datum? ordersList;
+  String dropdownvalue = '';
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    if(widget.query != null ){
+      _searchController.text = widget.query ?? "" ;
+    }
+    if(widget.name != null){
+      dropdownvalue=widget.name??"";
+    }
     _fetchOrders();
   }
 
+  @override
+  void dispose(){
+    //_scrollController.dispose();
+    super.dispose();
+  }
 
 
 
@@ -145,7 +177,11 @@ class _OrdersState extends State<Orders> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                 ),
-                                // controller: numberController,
+                                controller: _searchController,
+                                autofocus: true,
+                                onSubmitted: (value){
+                                  _searchOrder();
+                                },
                                 cursorColor: AppColors.appColor,
                                 // keyboardType: TextInputType.phone,
                                 //  inputFormatters: <TextInputFormatter>[
@@ -245,6 +281,69 @@ class _OrdersState extends State<Orders> {
 
                     ],
                   ),
+                  SizedBox(width: 70,),
+                  Column(
+                    crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Category Name To Filter",
+                        style: TextStyle(
+                            color: AppColors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 10, right: 10),
+                        height: 50,
+                        width: 200,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.whitecolor,
+                            border: Border.all(
+                              width: 1,
+                              color: Color(0xFFD1D5DB),
+                            )),
+                        child: DropdownButton<Datum>(
+                          isExpanded: true,
+                          underline:
+                          DropdownButtonHideUnderline(child: Container()),
+                          value: ordersList,
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 15,
+                            color:Colors.red,
+                          ),
+                          items: orders?.data.map<DropdownMenuItem<Datum>>((value) {
+                            return DropdownMenuItem(
+                              value: value,
+                              child: Text(
+                                "${value.categoryName}",
+                                style: TextStyle(
+                                    color: AppColors.red,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) async {
+                            print("${value?.userId}");
+                            setState(() {
+                              dropdownvalue = value?.categoryName as String;
+                              ordersList=value;
+                              // if(widget.name != null)
+                              // dropdownvalue = widget.name??"";
+                              _searchOrder();
+                            });
+                          },
+                        ),
+                      )
+                    ],
+                  )
                 ],
               ),
             ),

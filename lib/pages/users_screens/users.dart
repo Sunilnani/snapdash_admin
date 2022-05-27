@@ -13,7 +13,9 @@ import 'package:snapdash_admin/utils/appColors.dart';
 import 'package:snapdash_admin/utils/urls.dart';
 
 class Users extends StatefulWidget {
-  const Users({Key? key}) : super(key: key);
+  const Users({Key? key, this.query, this.gender}) : super(key: key);
+  final String? query;
+  final String? gender;
 
   @override
   State<Users> createState() => _UsersState();
@@ -45,7 +47,7 @@ class _UsersState extends State<Users> {
       _fetching = true;
     });
     try {
-      final response = await userManager.usersList();
+      final response = await userManager.usersList(query: _searchController.text.trim(),gender: dropdownvalue);
 
       if (response.status == ResponseStatus.SUCCESS) {
         Fluttertoast.showToast(msg: response.message);
@@ -68,10 +70,31 @@ class _UsersState extends State<Users> {
     }
   }
 
+  TextEditingController _searchController = TextEditingController();
+
+
+  _searchUser(){
+    final String query=_searchController.text.trim();
+
+    // _fetchSearchVehicles(query);
+    _fetchUsers();
+  }
+
+  UserDatum? userDataList;
+  String dropdownvalue = '';
+
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    if(widget.query != null ){
+      _searchController.text = widget.query ?? "" ;
+    }
+    if(widget.gender != null){
+      dropdownvalue=widget.gender??"";
+    }
     _fetchUsers();
   }
 
@@ -142,7 +165,11 @@ class _UsersState extends State<Users> {
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
-                            // controller: numberController,
+                            controller: _searchController,
+                            autofocus: true,
+                            onSubmitted: (value){
+                              _searchUser();
+                            },
                             cursorColor: AppColors.appColor,
                             // keyboardType: TextInputType.phone,
                             //  inputFormatters: <TextInputFormatter>[
@@ -203,9 +230,50 @@ class _UsersState extends State<Users> {
                       SizedBox(
                         height: 5,
                       ),
-                      DropDownWidget(
-                        Width: 200,
-                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 10, right: 10),
+                        height: 50,
+                        width: 200,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.whitecolor,
+                            border: Border.all(
+                              width: 1,
+                              color: Color(0xFFD1D5DB),
+                            )),
+                        child: DropdownButton<UserDatum>(
+                          isExpanded: true,
+                          underline:
+                          DropdownButtonHideUnderline(child: Container()),
+                          value: userDataList,
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 15,
+                            color:Colors.red,
+                          ),
+                          items: users?.userData.map<DropdownMenuItem<UserDatum>>((value) {
+                            return DropdownMenuItem(
+                              value: value,
+                              child:Text(
+                                "${value.gender}",
+                                style: TextStyle(
+                                    color: AppColors.red,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) async {
+                            //print("${value?.userId}");
+                            setState(() {
+                              dropdownvalue = value?.gender as String;
+                            //  userDataList=value!.gender;
+                              _searchUser();
+                            });
+                          },
+                        ),
+                      )
                     ],
                   ),
                   SizedBox(
@@ -224,9 +292,50 @@ class _UsersState extends State<Users> {
                       SizedBox(
                         height: 5,
                       ),
-                      DropDownWidget(
-                        Width: 200,
-                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 10, right: 10),
+                        height: 50,
+                        width: 200,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.whitecolor,
+                            border: Border.all(
+                              width: 1,
+                              color: Color(0xFFD1D5DB),
+                            )),
+                        child: DropdownButton<UserDatum>(
+                          isExpanded: true,
+                          underline:
+                          DropdownButtonHideUnderline(child: Container()),
+                          value: userDataList,
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 15,
+                            color:Colors.red,
+                          ),
+                          items: users?.userData.map<DropdownMenuItem<UserDatum>>((value) {
+                            return DropdownMenuItem(
+                              value: value,
+                              child:Text(
+                                "${value.gender}",
+                                style: TextStyle(
+                                    color: AppColors.red,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) async {
+                            //print("${value?.userId}");
+                            setState(() {
+                              dropdownvalue = value?.gender as String;
+                              //  userDataList=value!.gender;
+                              _searchUser();
+                            });
+                          },
+                        ),
+                      )
                     ],
                   ),
                   SizedBox(

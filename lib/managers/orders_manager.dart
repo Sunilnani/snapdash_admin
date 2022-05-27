@@ -28,10 +28,19 @@ class OrdersManager {
 
 
 
-  Future<ResponseData> ordersList() async {
+  Future<ResponseData> ordersList({String query = "", String name=""}) async {
     Response response;
     try {
-      response = await dioClient.ref!.get<dynamic>(URLS.ordersList);
+      final data = <String, dynamic>{};
+      if(query.isNotEmpty ) {
+        data['search_text'] = query;
+      }
+      if(name.isNotEmpty){
+
+        data["category_name"]=name;
+      }
+
+      response = await dioClient.ref!.get<dynamic>(URLS.ordersList,queryParameters: data);
       // print("------response agent List manager ${response.data}");
 
       if (response.statusCode == 200) {

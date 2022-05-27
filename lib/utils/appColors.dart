@@ -26,6 +26,8 @@ class AppColors{
   static Color light_red=Color(0x1AE30000);
   static Color whitecolor=Colors.white;
   static Color bgpink=Colors.pink.withOpacity(0.2);
+  static Color bgpinklight=Colors.pink.withOpacity(0.1);
+
   static Color black=Colors.black;
   static Color grey= Colors.grey.withOpacity(0.8);
   static Color greylight= Colors.grey.withOpacity(0.4);

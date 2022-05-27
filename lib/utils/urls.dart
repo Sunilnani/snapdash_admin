@@ -59,6 +59,10 @@ class URLS {
   static String updateProfile="/api/v1/admin_profile/";
 
 
+  static String activeAreas="/api/v1/active_areas/";
+  static String addLocation="/api/v1/active_areas/";
+
+
   static String parseImage(String? url) {
     if(url == null) return "";
     return baseUrl + url;

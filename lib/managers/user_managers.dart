@@ -30,10 +30,17 @@ class UsersManager {
 
 
 
-  Future<ResponseData> usersList() async {
+  Future<ResponseData> usersList({String query = "",String gender=""}) async {
     Response response;
     try {
-      response = await dioClient.ref!.get<dynamic>(URLS.userList);
+      final data = <String, dynamic>{};
+      if(query.isNotEmpty ) {
+        data['search_text'] = query;
+      }
+      if(gender.isNotEmpty){
+        data["gender"]=gender;
+      }
+      response = await dioClient.ref!.get<dynamic>(URLS.userList,queryParameters: data);
       print("------response user List manager ${response.data}");
 
       if (response.statusCode == 200) {

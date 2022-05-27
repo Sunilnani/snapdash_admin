@@ -17,6 +17,8 @@ import 'package:snapdash_admin/pages/delivery_agents_screens/update_deliveryAgen
 import 'package:snapdash_admin/utils/appColors.dart';
 import 'package:snapdash_admin/utils/urls.dart';
 class DeliveryAgents extends StatefulWidget {
+  const DeliveryAgents({Key? key, this.query}) : super(key: key);
+  final String? query;
 
   @override
   State<DeliveryAgents> createState() => _DeliveryAgentsState();
@@ -32,12 +34,14 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
 
   AgentsListModel? agents;
 
+
+
   Future<void> _fetchAgents() async {
     setState(() {
       _fetching = true;
     });
     try {
-      final response = await agentManager.agentsList();
+      final response = await agentManager.agentsList(query: _searchController.text.trim());
 
       if (response.status == ResponseStatus.SUCCESS) {
         Fluttertoast.showToast(msg: response.message);
@@ -58,6 +62,21 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
         _fetching = false;
       });
     }
+  }
+
+
+  TextEditingController _searchController = TextEditingController();
+
+
+  _searchAgent(){
+    final String query=_searchController.text.trim();
+
+    if(query.isEmpty){
+      return;
+    }
+    // _fetchSearchVehicles(query);
+    _fetchAgents();
+
   }
 
   bool _loading = false;
@@ -110,6 +129,15 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
     // TODO: implement initState
     super.initState();
     _fetchAgents();
+    if(widget.query != null){
+      _searchController.text = widget.query ?? "" ;
+      _searchAgent();
+    }
+  }
+  @override
+  void dispose(){
+    //_scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -173,7 +201,11 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
-                          // controller: numberController,
+                          controller: _searchController,
+                          autofocus: true,
+                          onSubmitted: (value){
+                            _searchAgent();
+                          },
                           cursorColor: AppColors.appColor,
                          // keyboardType: TextInputType.phone,
                          //  inputFormatters: <TextInputFormatter>[
@@ -193,17 +225,22 @@ class _DeliveryAgentsState extends State<DeliveryAgents> {
                       SizedBox(
                         width: 30,
                       ),
-                      Container(
-                        alignment: Alignment.center,
-                        height: 50,
-                        width: MediaQuery.of(context).size.width*0.05,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(4),
-                          color: AppColors.whitecolor,
-                        ),
-                        child: Text("Search",style: TextStyle(color: AppColors.red),),
+                      InkWell(
+                        onTap: (){
+                          _searchAgent();
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 50,
+                          width: MediaQuery.of(context).size.width*0.05,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.whitecolor,
+                          ),
+                          child: Text("Search",style: TextStyle(color: AppColors.red),),
 
+                        ),
                       ),
 
                       SizedBox(

@@ -3,9 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/notifiers/user_notifier.dart';
-import 'package:snapdash_admin/pages/my_vehicles_screens/my_vehicles.dart';
-import 'package:snapdash_admin/pages/orders_screens/order_details.dart';
-import 'package:snapdash_admin/pages/users_screens/view_user.dart';
+import 'package:snapdash_admin/notifiers/vehicleNotifier.dart';
+
 import 'package:snapdash_admin/splash_screen.dart';
 
 import 'pages/authentication_pages/login_page.dart';
@@ -23,8 +22,9 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        //ChangeNotifierProvider(create: (_) => CartNotifier()),
+
         ChangeNotifierProvider(create: (_) => UserNotifier()),
+        ChangeNotifierProvider(create: (_) => VehicleNotifier()),
       ],
       child: MyApp(),
     ),

@@ -1,12 +1,15 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
+import 'package:snapdash_admin/common/navigation_service.dart';
 import 'package:snapdash_admin/models/vehicles/search_vehicle_model.dart';
 import 'package:snapdash_admin/models/vehicles/un_assigned_vehicles_list_model.dart';
 import 'package:snapdash_admin/models/vehicles/vehicle_details_model.dart';
 import 'package:snapdash_admin/models/vehicles/vehicles_model.dart';
 import 'package:snapdash_admin/network_calls/base_network.dart';
 import 'package:snapdash_admin/network_calls/base_response.dart';
+import 'package:snapdash_admin/notifiers/vehicleNotifier.dart';
 import 'package:snapdash_admin/utils/urls.dart';
 
 
@@ -27,17 +30,28 @@ class VehiclesManager {
  
 
 
-  Future<ResponseData> vehicles() async {
+  Future<ResponseData> vehicles({String query = ""}) async {
     Response response;
     try {
-      response = await dioClient.ref!.get<dynamic>(URLS.vehiclesList);
+      final data = <String, dynamic>{};
+      if(query.isNotEmpty) {
+        data['search_text'] = query;
+      }
+      response = await dioClient.ref!.get<dynamic>(URLS.vehiclesList, queryParameters: data);
      // print("------response from  vehicles manager ${response.data}");
 
       if (response.statusCode == 200) {
 
-        final ordersList = vechiclesListFromJson(jsonEncode(response.data));
+        final vehiclesList = vechiclesListFromJson(jsonEncode(response.data));
+
+
+        Provider.of<VehicleNotifier>(
+            NavigationService.navigatorKey.currentContext!,listen:false
+        ).setUser(vehiclesList);
+
+
         return ResponseData("success", ResponseStatus.SUCCESS,
-            data: ordersList);
+            data: vehiclesList);
       } else {
         var message = "Unknown error";
         if (response.data?.containsKey("message") == true) {
@@ -183,33 +197,33 @@ class VehiclesManager {
     }
   }
 
-  Future<ResponseData> searchVehicle(String? query) async {
-    Response response;
-    print(" s---------${query}");
-    print(URLS.vehicleDetails(query.toString()));
-    try {
-
-      response =
-      await dioClient.ref!.get<dynamic>(URLS.searchVehicles(query));
-
-      if (response.statusCode == 200) {
-
-        print("Check 1 --> ${response.data}");
-        final searchVehicles = searchVehiclesModelFromJson(json.encode(response.data));
-        return ResponseData("", ResponseStatus.SUCCESS, data: searchVehicles);
-      } else {
-        var message = "Unknown error";
-        if (response.data.containsKey("message") == true) {
-          message = response.data['message'];
-        }
-        return ResponseData(message, ResponseStatus.FAILED);
-      }
-    } on Exception catch (err) {
-      print("error is ${err}");
-      // var msg = ParseError.parse(err);
-      return ResponseData<dynamic>('Please check your internet', ResponseStatus.FAILED);
-    }
-  }
+  // Future<ResponseData> searchVehicle(String? query) async {
+  //   Response response;
+  //   print(" s---------${query}");
+  //   print(URLS.vehicleDetails(query.toString()));
+  //   try {
+  //
+  //     response =
+  //     await dioClient.ref!.get<dynamic>(URLS.searchVehicles(query));
+  //
+  //     if (response.statusCode == 200) {
+  //
+  //       print("Check 1 --> ${response.data}");
+  //       final searchVehicles = searchVehiclesModelFromJson(json.encode(response.data));
+  //       return ResponseData("", ResponseStatus.SUCCESS, data: searchVehicles);
+  //     } else {
+  //       var message = "Unknown error";
+  //       if (response.data.containsKey("message") == true) {
+  //         message = response.data['message'];
+  //       }
+  //       return ResponseData(message, ResponseStatus.FAILED);
+  //     }
+  //   } on Exception catch (err) {
+  //     print("error is ${err}");
+  //     // var msg = ParseError.parse(err);
+  //     return ResponseData<dynamic>('Please check your internet', ResponseStatus.FAILED);
+  //   }
+  // }
 
 
 

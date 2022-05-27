@@ -27,10 +27,17 @@ class AgentsManager {
 
 
 
-  Future<ResponseData> agentsList() async {
+  Future<ResponseData> agentsList({String query = ""}) async {
     Response response;
     try {
-      response = await dioClient.ref!.get<dynamic>(URLS.agentsList);
+
+      final data = <String, dynamic>{};
+      if(query.isNotEmpty) {
+        data['search_text'] = query;
+      }
+
+
+      response = await dioClient.ref!.get<dynamic>(URLS.agentsList,queryParameters: data);
       print("------response agent List manager ${response.data}");
 
       if (response.statusCode == 200) {
